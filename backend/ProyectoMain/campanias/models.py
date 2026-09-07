@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator
 
 class EstadoCampaniaChoices(models.TextChoices):
     ACTIVA = 'Activa', 'Activa'
@@ -18,6 +19,11 @@ class Campania(models.Model):
     )
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
+    cupo_maximo = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1)],
+    )
     estado_campania = models.CharField(
         max_length=12,
         choices=EstadoCampaniaChoices.choices,

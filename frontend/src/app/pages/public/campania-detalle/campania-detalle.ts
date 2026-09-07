@@ -60,12 +60,9 @@ export class CampaniaDetalle implements OnInit {
 
   getEstado(): string {
     if (!this.campania) return '';
-    const hoy = new Date();
-    const inicio = new Date(this.campania.fecha_inicio);
-    const fin = new Date(this.campania.fecha_fin);
-    if (hoy < inicio) return 'Proxima';
-    if (hoy > fin) return 'Finalizada';
-    return 'En Curso';
+    if (this.campania.estado_calculado === 'Proximamente') return 'Proxima';
+    if (this.campania.estado_calculado === 'Activa') return 'En Curso';
+    return 'Finalizada';
   }
 
   formatearFecha(fecha: string): string {
@@ -106,14 +103,20 @@ export class CampaniaDetalle implements OnInit {
       },
 
       error: (err: HttpErrorResponse) => {
-        const inscripcionDuplicada =
-          err.status === 409 &&
-          err.error?.codigo === 'inscripcion_duplicada';
+        const codigo = err.error?.codigo;
+        const errorEsperado = [
+          'inscripcion_duplicada',
+          'edad_no_permitida',
+          'cupo_completo',
+          'campania_finalizada'
+        ].includes(codigo);
 
         Swal.fire({
-          icon: inscripcionDuplicada ? 'info' : 'error',
-          title: inscripcionDuplicada ? 'Inscripción existente' : 'Error',
-          text: inscripcionDuplicada
+          icon: errorEsperado ? 'info' : 'error',
+          title: codigo === 'inscripcion_duplicada'
+            ? 'Inscripción existente'
+            : 'No es posible inscribirse',
+          text: errorEsperado
             ? err.error.mensaje
             : 'Hubo un problema al inscribirse a la campaña',
           showConfirmButton: false,

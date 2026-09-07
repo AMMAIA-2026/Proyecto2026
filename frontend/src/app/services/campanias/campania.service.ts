@@ -33,6 +33,9 @@ export interface Campania {
   centro_salud_detalle: CentroSalud | null;
   fecha_inicio: string;
   fecha_fin: string;
+  cupo_maximo: number | null;
+  total_inscriptos: number;
+  estado_calculado: string;
   estado?: string;
 }
 
@@ -49,7 +52,7 @@ export class CampaniaService {
     return this.http.get<Campania[]>(this.apiUrl).pipe(
       map(campanias => campanias.map(c => ({
         ...c,
-        estado: this.calcularEstado(c.fecha_inicio, c.fecha_fin)
+        estado: c.estado_calculado
       })))
     );
   }
@@ -58,7 +61,7 @@ export class CampaniaService {
     return this.http.get<Campania>(`${this.apiUrl}${id}/`).pipe(
       map(c => ({
         ...c,
-        estado: this.calcularEstado(c.fecha_inicio, c.fecha_fin),
+        estado: c.estado_calculado,
         fecha_inicio_formateada: this.formatearFecha(c.fecha_inicio),
         fecha_fin_formateada: this.formatearFecha(c.fecha_fin)
       }))
@@ -69,18 +72,6 @@ export class CampaniaService {
     return this.http.get<CentroSalud[]>(
       'http://localhost:8000/centros-salud/'
     );
-  }
-
-  private calcularEstado(fechaInicio: string, fechaFin: string): string {
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
-    const [yi, mi, di] = fechaInicio.split('-').map(Number);
-    const [yf, mf, df] = fechaFin.split('-').map(Number);
-    const inicio = new Date(yi, mi - 1, di);
-    const fin = new Date(yf, mf - 1, df);
-    if (hoy < inicio) return 'Proxima';
-    if (hoy > fin) return 'Finalizada';
-    return 'En Curso';
   }
 
   private formatearFecha(fecha: string): string {

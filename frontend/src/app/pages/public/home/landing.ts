@@ -24,12 +24,9 @@ export class Landing implements OnInit {
   ngOnInit(): void {
     this.campaniaService.getCampanias().subscribe({
       next: (datos: Campania[]) => {
-        const hoy = new Date();
-        this.campanias = datos.filter(c => {
-          const [yf, mf, df] = c.fecha_fin.split('-').map(Number);
-          const fin = new Date(yf, mf - 1, df);
-          return hoy <= fin;
-        });
+        this.campanias = datos.filter(
+          campania => campania.estado_calculado !== 'Finalizada'
+        );
 
         this.cargando = false;
         this.cdr.detectChanges();

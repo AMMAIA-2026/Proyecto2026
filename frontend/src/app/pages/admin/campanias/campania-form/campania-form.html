@@ -60,6 +60,13 @@
                      }
                  </div>
 
+                <div class="input-group">
+                    <label>Cupo de donantes (opcional)</label>
+                    <input type="number" min="1" formControlName="cupo_maximo" placeholder="Sin límite" />
+                    @if (obtenerError('cupo_maximo')) {
+                    <p class="error">{{ obtenerError('cupo_maximo') }}</p>}
+                </div>
+
                  <div class="input-group">
                      <label>Estado (automático)</label>
                      <input formControlName="estado_campania" readonly />

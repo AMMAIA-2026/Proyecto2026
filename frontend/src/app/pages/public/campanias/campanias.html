@@ -17,9 +17,9 @@
     </div>
     <select class="campanias__select" [(ngModel)]="filtroEstado" (change)="filtrar()">
             <option value="">Filtrar campañas</option>
-            <option value="proxima">Próximas</option>
-            <option value="activa">Activas</option>
-            <option value="finalizada">Finalizadas</option>
+            <option value="Proximamente">Próximas</option>
+            <option value="Activa">Activas</option>
+            <option value="Finalizada">Finalizadas</option>
     </select>
     </div>
 </div>
@@ -72,6 +72,9 @@
                 <path d="M5 1V4M11 1V4M2 7H14" stroke="#888" stroke-width="1.5" stroke-linecap="round"/>
                 </svg>
                 {{ campania.fecha_inicio }} — {{ campania.fecha_fin }}
+            </span>
+            <span class="card__meta-item">
+                Cupo: {{ campania.total_inscriptos }} / {{ campania.cupo_maximo ?? 'Sin límite' }}
             </span>
             </div>
 

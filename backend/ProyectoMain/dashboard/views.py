@@ -1,10 +1,11 @@
 from datetime import datetime, time, timedelta
-from django.db.models import Case, CharField, Count, DateField, IntegerField, Value, When
+from django.db.models import Case, Count, DateField, IntegerField, Value, When
 from django.db.models.functions import Cast, ExtractMonth, ExtractYear
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from campanias.models import Campania, EstadoCampaniaChoices
+from campanias.serializers import CampaniaSerializer
 from inscripciones.models import Inscripcion
 from usuarios.models import RolChoices
 from usuarios.permissions import EsAdministrador
@@ -28,13 +29,6 @@ class DashboardView(APIView):
             )
         else:
             fin_periodo = inicio_mes_actual.replace(month=inicio_mes_actual.month + 1)
-
-        estado_actual = Case(
-            When(fecha_inicio__gt=hoy, then=Value(EstadoCampaniaChoices.PROXIMAMENTE)),
-            When(fecha_fin__lt=hoy, then=Value(EstadoCampaniaChoices.FINALIZADA)),
-            default=Value(EstadoCampaniaChoices.ACTIVA),
-            output_field=CharField(),
-        )
 
         zona_horaria = timezone.get_current_timezone()
         inicio_periodo_datetime = timezone.make_aware(
@@ -63,9 +57,34 @@ class DashboardView(APIView):
             .distinct()
             .count()
         )
+        conteo_estados = {}
+        campanias_con_totales = (
+            Campania.objects
+            .annotate(total_inscriptos=Count('inscripcion'))
+            .values(
+                'fecha_inicio',
+                'fecha_fin',
+                'cupo_maximo',
+                'total_inscriptos',
+            )
+        )
+        for campania in campanias_con_totales:
+            estado = CampaniaSerializer.calcular_estado(
+                campania['fecha_inicio'],
+                campania['fecha_fin'],
+                campania['cupo_maximo'],
+                campania['total_inscriptos'],
+            )
+            conteo_estados[estado] = conteo_estados.get(estado, 0) + 1
+
+        campanias_por_estado = [
+            {'estado': estado, 'cantidad': cantidad}
+            for estado, cantidad in sorted(conteo_estados.items())
+        ]
         campanias_recientes = (
             Campania.objects.select_related('centro_salud')
             .filter(fecha_fin__gte=hoy)
+            .annotate(total_inscriptos_anotado=Count('inscripcion'))
             .annotate(
                 prioridad=Case(
                     When(fecha_inicio__lte=hoy, then=Value(0)),
@@ -74,12 +93,6 @@ class DashboardView(APIView):
                 )
             )
             .order_by('prioridad', 'fecha_inicio', '-id')[:5]
-        )
-        campanias_por_estado = (
-            Campania.objects.annotate(estado=estado_actual)
-            .values('estado')
-            .annotate(cantidad=Count('id'))
-            .order_by('estado')
         )
         inscripciones_por_mes = (
             inscripciones_periodo.values('anio', 'mes')

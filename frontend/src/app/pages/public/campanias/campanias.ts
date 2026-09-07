@@ -43,9 +43,9 @@ export class Campanias implements OnInit {
         .includes(this.busqueda.toLowerCase());
 
       if (!this.filtroEstado) {
-        return coincideBusqueda && c.estado !== 'Finalizada';
+        return coincideBusqueda && c.estado_calculado !== 'Finalizada';
       }
-      return coincideBusqueda && c.estado === this.filtroEstado;
+      return coincideBusqueda && c.estado_calculado === this.filtroEstado;
     });
     this.cdr.detectChanges();
   }

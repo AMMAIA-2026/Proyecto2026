@@ -7,6 +7,7 @@ import {
   passwordsCoinciden,
   validadoresPassword
 } from '../../../validators/password.validators';
+import { advertenciaEdad } from '../../../validators/edad.validator';
 
 @Component({
   selector: 'app-registro',
@@ -44,10 +45,15 @@ export class Registro {
        confirmar_password: ['', Validators.required],
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
+      fecha_nacimiento: ['', Validators.required],
       dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
        rol: ['Usuario Estandar'],
       grupo_sanguineo: ['', Validators.required]
      }, { validators: passwordsCoinciden });
+  }
+
+  advertenciaFechaNacimiento(): string {
+    return advertenciaEdad(this.registroForm.get('fecha_nacimiento')?.value);
   }
 
   onSubmit() {
