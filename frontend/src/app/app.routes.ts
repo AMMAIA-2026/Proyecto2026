@@ -15,6 +15,8 @@ import { Informate } from './pages/public/informate/informate';
 import { authGuard } from './guards/auth-guard';
 import { CampaniaForm } from './pages/admin/campanias/campania-form/campania-form';
 import { RecuperarPassword } from './pages/public/recuperar-password/recuperar-password';
+import { ContactosAdmin } from './pages/admin/contactos/contactos';
+import { Contactanos } from './pages/public/contactanos/contactanos';
 
 
 
@@ -33,6 +35,7 @@ export const routes: Routes = [
             { path: 'campanias/:id', component: CampaniaDetalle },
             { path: 'registro', component: Registro },
             { path: 'informate', component: Informate },
+            { path: 'contactanos', component: Contactanos },
 
         ]
     },
@@ -51,6 +54,7 @@ export const routes: Routes = [
             { path: 'campanias/nueva', component: CampaniaForm },
             { path: 'campanias/editar/:id', component: CampaniaForm },
             { path: 'usuarios', component: Usuarios },
+            { path: 'contactos', component: ContactosAdmin },
         ]
     },
 

@@ -1,0 +1,35 @@
+.contactos-page { display: flex; flex-direction: column; gap: 24px; color: var(--text); }
+.contactos-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+.eyebrow { color: var(--red); font-size: .75rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.contactos-header h1 { margin: 6px 0; font-size: 2rem; }
+.contactos-header p { margin: 0; color: var(--text-mid); }
+.controles { display: flex; gap: 12px; }
+.controles label { display: flex; flex-direction: column; gap: 6px; color: var(--text-mid); font-size: .75rem; font-weight: 700; }
+.controles select { min-width: 170px; padding: 10px 12px; background: white; border: 1px solid var(--border); border-radius: 10px; color: var(--text); }
+.contactos-panel { overflow: hidden; background: white; border-radius: 20px; box-shadow: var(--shadow); }
+.tabla-wrapper { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 16px 18px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--text-mid); font-size: .76rem; text-transform: uppercase; letter-spacing: .04em; background: #fafafa; }
+td { font-size: .9rem; }
+tr.no-leido td { font-weight: 600; background: #fffafa; }
+.asunto { max-width: 320px; }
+.badge { display: inline-block; padding: 6px 10px; color: #9b2c23; background: #fde9e7; border-radius: 99px; font-size: .74rem; font-weight: 800; }
+.badge--tracked { color: #27633a; background: #e4f5e9; }
+.ver-btn, .seguimiento-btn { padding: 9px 14px; color: white; font-weight: 700; background: var(--red); border: 0; border-radius: 9px; cursor: pointer; white-space: nowrap; }
+.ver-btn:hover, .seguimiento-btn:hover { background: var(--red-dark); }
+.estado { padding: 40px; color: var(--text-mid); text-align: center; }
+.estado--error { color: var(--red); }
+.modal-overlay { position: fixed; inset: 0; z-index: 3000; display: grid; place-items: center; padding: 20px; background: rgba(28,20,20,.52); backdrop-filter: blur(4px); }
+.mensaje-modal { position: relative; width: min(100%, 620px); padding: 32px; background: white; border-radius: 22px; box-shadow: 0 25px 70px rgba(0,0,0,.2); }
+.mensaje-modal h2 { margin: 18px 40px 10px 0; font-size: 1.45rem; }
+.cerrar-btn { position: absolute; top: 18px; right: 18px; width: 36px; height: 36px; border: 0; border-radius: 50%; font-size: 1.5rem; background: #f3f3f3; cursor: pointer; }
+.mensaje-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; color: var(--text-mid); font-size: .85rem; }
+.mensaje-meta a { color: var(--red); }
+.mensaje-contenido { margin: 24px 0; padding: 20px; color: #333; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; background: #fafafa; border-radius: 12px; }
+@media (max-width: 760px) {
+  .contactos-header { align-items: stretch; flex-direction: column; }
+  .controles { flex-direction: column; }
+  .controles select { width: 100%; }
+  .mensaje-modal { padding: 24px; }
+}

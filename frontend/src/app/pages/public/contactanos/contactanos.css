@@ -1,0 +1,21 @@
+.contact-page { display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); align-items: center; gap: 64px; min-height: calc(100vh - 70px); max-width: 1080px; margin: 0 auto; padding: 64px 52px; color: var(--text); }
+.eyebrow { display: block; margin-bottom: 12px; color: var(--red); font-size: .75rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.contact-intro h1 { margin: 0 0 16px; font-size: 3rem; line-height: 1.05; }
+.contact-intro > p { max-width: 390px; color: var(--text-mid); font-size: 1.05rem; line-height: 1.65; }
+.contact-note { display: flex; align-items: center; gap: 12px; max-width: 390px; margin-top: 32px; padding: 16px; color: var(--text-mid); font-size: .88rem; line-height: 1.5; background: #fff5f4; border-radius: 14px; }
+.contact-note svg { flex: 0 0 24px; width: 24px; color: var(--red); }
+.contact-form { display: flex; flex-direction: column; gap: 18px; padding: 32px; background: white; border-radius: 22px; box-shadow: var(--shadow); }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { font-size: .85rem; font-weight: 700; }
+.field input, .field textarea { width: 100%; padding: 13px 14px; color: var(--text); font: inherit; font-size: .9rem; background: white; border: 1px solid var(--border); border-radius: 10px; outline: none; resize: vertical; }
+.field input:focus, .field textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,.1); }
+.field small { color: var(--red); font-size: .75rem; }
+.counter { align-self: flex-end; color: var(--text-light); font-size: .7rem; }
+.contact-form button { align-self: flex-start; padding: 13px 28px; color: white; font-weight: 700; background: var(--red); border: 0; border-radius: 99px; cursor: pointer; }
+.contact-form button:hover { background: var(--red-dark); }
+.contact-form button:disabled { cursor: not-allowed; opacity: .65; }
+@media (max-width: 760px) {
+  .contact-page { grid-template-columns: 1fr; gap: 32px; min-height: auto; padding: 48px 20px 64px; }
+  .contact-intro h1 { font-size: 2.35rem; }
+  .contact-form { padding: 24px; }
+}

@@ -1,0 +1,91 @@
+<section class="contactos-page">
+  <header class="contactos-header">
+    <div>
+      <span class="eyebrow">Bandeja de entrada</span>
+      <h1>Mensajes de contacto</h1>
+      <p>{{ pendientes() }} pendientes de revisión</p>
+    </div>
+
+    <div class="controles">
+      <label>
+        Estado
+        <select [value]="filtro()" (change)="cambiarFiltro($event)">
+          <option value="todos">Todos</option>
+          <option value="pendientes">No leídos</option>
+          <option value="revisados">Leídos</option>
+        </select>
+      </label>
+
+      <label>
+        Orden
+        <select [value]="orden()" (change)="cambiarOrden($event)">
+          <option value="prioridad">Pendientes primero</option>
+          <option value="recientes">Más recientes</option>
+          <option value="antiguos">Más antiguos</option>
+        </select>
+      </label>
+    </div>
+  </header>
+
+  <div class="contactos-panel">
+    @if (cargando()) {
+    <p class="estado">Cargando mensajes...</p>
+    } @else if (error()) {
+    <p class="estado estado--error">{{ error() }}</p>
+    } @else {
+    <div class="tabla-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Estado</th>
+            <th>Email</th>
+            <th>Asunto</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (contacto of contactosVisibles(); track contacto.id) {
+          <tr [class.no-leido]="!contacto.tracked">
+            <td>
+              <span class="badge" [class.badge--tracked]="contacto.tracked">
+                {{ contacto.tracked ? 'Leído' : 'Pendiente' }}
+              </span>
+            </td>
+            <td>{{ contacto.email }}</td>
+            <td class="asunto">{{ contacto.asunto }}</td>
+            <td>{{ contacto.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td><button class="ver-btn" (click)="abrirDetalle(contacto.id)">Ver mensaje</button></td>
+          </tr>
+          } @empty {
+          <tr><td colspan="5" class="estado">No hay mensajes para este filtro.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+</section>
+
+@if (contactoSeleccionado(); as contacto) {
+<div class="modal-overlay" (click)="cerrarDetalle()">
+  <article class="mensaje-modal" (click)="$event.stopPropagation()">
+    <button class="cerrar-btn" (click)="cerrarDetalle()" aria-label="Cerrar">×</button>
+    <span class="badge" [class.badge--tracked]="contacto.tracked">
+      {{ contacto.tracked ? 'Leído' : 'Pendiente' }}
+    </span>
+    <h2>{{ contacto.asunto }}</h2>
+    <div class="mensaje-meta">
+      <a [href]="'mailto:' + contacto.email">{{ contacto.email }}</a>
+      <span>{{ contacto.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</span>
+    </div>
+    <p class="mensaje-contenido">{{ contacto.mensaje }}</p>
+    <button
+      class="seguimiento-btn"
+      (click)="cambiarSeguimiento(contacto, !contacto.tracked)"
+    >
+      {{ contacto.tracked ? 'Marcar como no leído' : 'Marcar como leído' }}
+    </button>
+  </article>
+</div>
+}
