@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'campanias',
     'dashboard',
     'centros_salud',
+    'contactos',
 ]
 
 MIDDLEWARE = [
