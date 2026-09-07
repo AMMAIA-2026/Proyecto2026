@@ -12,6 +12,8 @@ export interface DashboardCampania {
     centro_salud_detalle: CentroSalud | null;
     fecha_inicio: string;
     fecha_fin: string;
+    cupo_maximo: number | null;
+    total_inscriptos: number;
     estado_campania: string;
     estado_calculado: string;
     estado: string;

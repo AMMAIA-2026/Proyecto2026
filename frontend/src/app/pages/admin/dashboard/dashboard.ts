@@ -52,9 +52,21 @@ export class AdminDashboard {
   modalAbierto: string | null = null;
 
   private agruparCampanias(campanias: { estado: string; cantidad: number }[]): CampaniaGrafico[] {
-    const total = campanias.reduce((suma, item) => suma + item.cantidad, 0);
+    const cantidadesPorEstado = new Map<string, number>();
+    for (const item of campanias) {
+      cantidadesPorEstado.set(
+        item.estado,
+        (cantidadesPorEstado.get(item.estado) || 0) + item.cantidad
+      );
+    }
 
-    return campanias.map((item, index) => ({
+    const agrupadas = Array.from(
+      cantidadesPorEstado,
+      ([estado, cantidad]) => ({ estado, cantidad })
+    );
+    const total = agrupadas.reduce((suma, item) => suma + item.cantidad, 0);
+
+    return agrupadas.map((item, index) => ({
       estado: item.estado,
       count: item.cantidad,
       porcentaje: total ? Math.round((item.cantidad / total) * 100) : 0,

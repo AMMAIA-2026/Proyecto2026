@@ -29,6 +29,7 @@ export class CampaniaForm implements OnInit {
   minFechaInicio = this.fechaMinima;
   centrosSalud: CentroSalud[] = [];
   errorCentros = '';
+  totalInscriptosActual = 0;
 
   mensajesError: any = {
     titulo: {
@@ -50,7 +51,8 @@ export class CampaniaForm implements OnInit {
       required: 'El centro de salud es obligatorio.'
     },
     fecha_inicio: { required: 'La fecha de inicio es obligatoria.' },
-    fecha_fin: { required: 'La fecha de finalización es obligatoria.' }
+    fecha_fin: { required: 'La fecha de finalización es obligatoria.' },
+    cupo_maximo: { min: 'El cupo debe ser de al menos 1 donante.' }
   };
 
   private fb = inject(FormBuilder);
@@ -78,6 +80,7 @@ export class CampaniaForm implements OnInit {
       centro_salud: [null, Validators.required],
       fecha_inicio: ['', Validators.required],
       fecha_fin: ['', Validators.required],
+      cupo_maximo: [null, Validators.min(1)],
       estado_campania: [{ value: '', disabled: true }]
     });
 
@@ -121,6 +124,7 @@ export class CampaniaForm implements OnInit {
         this.centrosSalud = centros;
         const data = campania;
         this.fechaInicioOriginal = data.fecha_inicio;
+        this.totalInscriptosActual = data.total_inscriptos;
         this.minFechaInicio = data.fecha_inicio < this.fechaMinima
           ? data.fecha_inicio
           : this.fechaMinima;
@@ -130,7 +134,8 @@ export class CampaniaForm implements OnInit {
           ubicacion: data.ubicacion,
           centro_salud: data.centro_salud,
           fecha_inicio: data.fecha_inicio,
-          fecha_fin: data.fecha_fin
+          fecha_fin: data.fecha_fin,
+          cupo_maximo: data.cupo_maximo
         });
         this.actualizarEstado();
         this.cdr.detectChanges();
@@ -146,6 +151,7 @@ export class CampaniaForm implements OnInit {
   validarFechas(): string {
     const inicio = this.campaniaForm.value.fecha_inicio;
     const fin = this.campaniaForm.value.fecha_fin;
+    const cupo = this.campaniaForm.value.cupo_maximo;
 
     if (!inicio || !fin) {
       return '';
@@ -158,7 +164,9 @@ export class CampaniaForm implements OnInit {
       return 'La fecha de inicio no puede ser anterior a hoy.';
     }
 
-    if (fin < this.fechaMinima) {
+    if (cupo && this.totalInscriptosActual >= cupo) {
+      this.estadoActual = 'Finalizada';
+    } else if (fin < this.fechaMinima) {
       return 'No se puede crear o editar una campaña finalizada.';
     }
 

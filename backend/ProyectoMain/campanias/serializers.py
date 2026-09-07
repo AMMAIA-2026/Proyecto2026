@@ -6,6 +6,7 @@ from django.utils import timezone
 class CampaniaSerializer(serializers.ModelSerializer):
 
     estado_calculado = serializers.SerializerMethodField()
+    total_inscriptos = serializers.SerializerMethodField()
     centro_salud_detalle = CentroSaludSerializer(
         source='centro_salud',
         read_only=True,
@@ -26,6 +27,10 @@ class CampaniaSerializer(serializers.ModelSerializer):
         fecha_fin = attrs.get(
             'fecha_fin',
             self.instance.fecha_fin if self.instance else None
+        )
+        cupo_maximo = attrs.get(
+            'cupo_maximo',
+            self.instance.cupo_maximo if self.instance else None
         )
         hoy = timezone.localdate()
 
@@ -57,15 +62,39 @@ class CampaniaSerializer(serializers.ModelSerializer):
                 'fecha_fin': 'La fecha de fin no puede ser anterior a la fecha de inicio.'
             })
 
-        attrs['estado_campania'] = self.calcular_estado(fecha_inicio, fecha_fin)
+        total_inscriptos = self.instance.inscripcion_set.count() if self.instance else 0
+        attrs['estado_campania'] = self.calcular_estado(
+            fecha_inicio,
+            fecha_fin,
+            cupo_maximo,
+            total_inscriptos,
+        )
         return attrs
 
     def get_estado_calculado(self, obj):
-        return self.calcular_estado(obj.fecha_inicio, obj.fecha_fin)
+        return self.calcular_estado(
+            obj.fecha_inicio,
+            obj.fecha_fin,
+            obj.cupo_maximo,
+            self.get_total_inscriptos(obj),
+        )
+
+    def get_total_inscriptos(self, obj):
+        total_anotado = getattr(obj, 'total_inscriptos_anotado', None)
+        if total_anotado is not None:
+            return total_anotado
+        return obj.inscripcion_set.count()
 
     @staticmethod
-    def calcular_estado(fecha_inicio, fecha_fin):
+    def calcular_estado(
+        fecha_inicio,
+        fecha_fin,
+        cupo_maximo=None,
+        total_inscriptos=0,
+    ):
         hoy = timezone.localdate()
+        if cupo_maximo is not None and total_inscriptos >= cupo_maximo:
+            return EstadoCampaniaChoices.FINALIZADA
         if fecha_inicio > hoy:
             return EstadoCampaniaChoices.PROXIMAMENTE
         if fecha_fin >= hoy:

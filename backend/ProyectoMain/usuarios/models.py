@@ -51,6 +51,7 @@ class Usuario(AbstractUser):
             )
         ]
     )
+    fecha_nacimiento = models.DateField()
     fecha_registro = models.DateField(auto_now_add=True)
 
     rol = models.CharField(

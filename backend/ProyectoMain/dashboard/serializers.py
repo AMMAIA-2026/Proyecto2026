@@ -34,6 +34,8 @@ class CampaniaRecienteSerializer(CampaniaSerializer):
             'centro_salud_detalle',
             'fecha_inicio',
             'fecha_fin',
+            'cupo_maximo',
+            'total_inscriptos',
             'estado_campania',
             'estado_calculado',
             'estado',

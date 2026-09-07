@@ -175,6 +175,7 @@
                         <th>Campaña</th>
                         <th>Ubicación</th>
                         <th>Centro médico</th>
+                        <th>Cupo</th>
                         <th>Estado</th>
                     </tr>
 
@@ -202,6 +203,10 @@
                         </td>
 
                         <td>
+                            {{ campania.total_inscriptos }} / {{ campania.cupo_maximo ?? 'Sin límite' }}
+                        </td>
+
+                        <td>
 
                             <span class="badge" [class.active]="campania.estado === 'Activa'"
                                 [class.ended]="campania.estado === 'Finalizada'">
@@ -217,7 +222,7 @@
                     } @empty {
 
                     <tr>
-                        <td colspan="4">
+                        <td colspan="5">
                             No hay campañas recientes
                         </td>
                     </tr>

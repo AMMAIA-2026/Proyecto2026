@@ -98,6 +98,9 @@
                 </svg>
                 {{ formatearFecha(c.fecha_inicio) }} — {{ formatearFecha(c.fecha_fin) }}
                 </span>
+                <span>
+                Cupo: {{ c.total_inscriptos }} / {{ c.cupo_maximo ?? 'Sin límite' }}
+                </span>
             </div>
 
             @if (c.descripcion) {

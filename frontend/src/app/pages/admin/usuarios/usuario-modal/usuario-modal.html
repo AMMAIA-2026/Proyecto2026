@@ -15,6 +15,7 @@
         <div class="campo"><span>Nombre</span><p>{{ usuario.nombre }} {{ usuario.apellido }}</p></div>
         <div class="campo"><span>Email</span><p>{{ usuario.email }}</p></div>
         <div class="campo"><span>DNI</span><p>{{ usuario.dni }}</p></div>
+        <div class="campo"><span>Fecha de nacimiento</span><p>{{ usuario.fecha_nacimiento }}</p></div>
         <div class="campo"><span>Grupo sanguíneo</span><p>{{ usuario.grupo_sanguineo }}</p></div>
         <div class="campo"><span>Fecha de registro</span><p>{{ usuario.fecha_registro }}</p></div>
       </div>
@@ -50,6 +51,24 @@
           @if (editForm.get('dni')?.invalid && editForm.get('dni')?.touched) {
             <small class="error">Obligatorio</small>
           }
+        </div>
+        <div class="campo">
+          <label>Fecha de nacimiento</label>
+          <input type="date" formControlName="fecha_nacimiento">
+          @if (editForm.get('fecha_nacimiento')?.invalid && editForm.get('fecha_nacimiento')?.touched) {
+            <small class="error">Obligatorio</small>
+          }
+          @if (advertenciaFechaNacimiento()) {
+            <small class="advertencia-edad">{{ advertenciaFechaNacimiento() }}</small>
+          }
+        </div>
+        <div class="campo">
+          <label>Grupo sanguíneo</label>
+          <select formControlName="grupo_sanguineo">
+            @for (grupo of gruposSanguineos; track grupo) {
+              <option [value]="grupo">{{ grupo }}</option>
+            }
+          </select>
         </div>
         @if (error) { <p class="error">{{ error }}</p> }
         <div class="modal-footer">

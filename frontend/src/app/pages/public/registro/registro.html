@@ -71,6 +71,17 @@
                 </div>
 
                 <div class="input-group">
+                    <label>Fecha de nacimiento</label>
+                    <input type="date" formControlName="fecha_nacimiento">
+                    @if (registroForm.get('fecha_nacimiento')?.invalid && registroForm.get('fecha_nacimiento')?.touched) {
+                    <small class="error">La fecha de nacimiento es obligatoria</small>
+                    }
+                    @if (advertenciaFechaNacimiento()) {
+                    <small class="advertencia-edad">{{ advertenciaFechaNacimiento() }}</small>
+                    }
+                </div>
+
+                <div class="input-group">
                     <label>Repetir contraseña</label>
                     <input type="password" placeholder="Repetir contraseña" formControlName="confirmar_password">
                     @if (registroForm.get('confirmar_password')?.touched &&
