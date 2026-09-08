@@ -23,7 +23,8 @@ export class CampaniaForm implements OnInit {
   modoEdicion = false;
   campaniaId: number | null = null;
   estadoActual = '';
-  mensajeErrorFechas = '';
+  mensajeErrorFechaInicio = '';
+  mensajeErrorFechaFin = '';
   fechaInicioOriginal: string | null = null;
   readonly fechaMinima = this.formatearFechaParaInput(new Date());
   minFechaInicio = this.fechaMinima;
@@ -149,6 +150,9 @@ export class CampaniaForm implements OnInit {
 
 
   validarFechas(): string {
+    this.mensajeErrorFechaInicio = '';
+    this.mensajeErrorFechaFin = '';
+
     const inicio = this.campaniaForm.value.fecha_inicio;
     const fin = this.campaniaForm.value.fecha_fin;
     const cupo = this.campaniaForm.value.cupo_maximo;
@@ -161,17 +165,20 @@ export class CampaniaForm implements OnInit {
       (!this.modoEdicion && inicio < this.fechaMinima) ||
       (this.modoEdicion && inicio < this.fechaMinima && inicio !== this.fechaInicioOriginal)
     ) {
-      return 'La fecha de inicio no puede ser anterior a hoy.';
+      this.mensajeErrorFechaInicio = 'La fecha de inicio no puede ser anterior a hoy.';
+      return this.mensajeErrorFechaInicio;
     }
 
     if (cupo && this.totalInscriptosActual >= cupo) {
       this.estadoActual = 'Finalizada';
     } else if (fin < this.fechaMinima) {
-      return 'No se puede crear o editar una campaña finalizada.';
+      this.mensajeErrorFechaFin = 'No se puede crear o editar una campaña finalizada.';
+      return this.mensajeErrorFechaFin;
     }
 
     if (fin < inicio) {
-      return 'La fecha de fin no puede ser anterior a la fecha de inicio.';
+      this.mensajeErrorFechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
+      return this.mensajeErrorFechaFin;
     }
 
     return '';
@@ -182,7 +189,7 @@ export class CampaniaForm implements OnInit {
     const inicio = this.campaniaForm.value.fecha_inicio;
     const fin = this.campaniaForm.value.fecha_fin;
 
-    this.mensajeErrorFechas = this.validarFechas();
+    this.validarFechas();
 
     if (!inicio || !fin) {
       this.estadoActual = '';
@@ -190,7 +197,11 @@ export class CampaniaForm implements OnInit {
       return;
     }
 
-    if (fin < this.fechaMinima) {
+    const cupo = this.campaniaForm.value.cupo_maximo;
+
+    if (cupo && this.totalInscriptosActual >= cupo) {
+      this.estadoActual = 'Finalizada';
+    } else if (fin < this.fechaMinima) {
       this.estadoActual = 'Finalizada';
     } else if (inicio > this.fechaMinima) {
       this.estadoActual = 'Proximamente';
@@ -223,6 +234,10 @@ export class CampaniaForm implements OnInit {
     const primerError = Object.keys(control.errors)[0];
 
     return this.mensajesError[campo]?.[primerError] || '';
+  }
+
+  cancelar(): void {
+    this.router.navigate(['/admin/campanias']);
   }
 
 

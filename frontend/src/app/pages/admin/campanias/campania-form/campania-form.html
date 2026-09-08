@@ -46,18 +46,21 @@
                 <div class="input-group">
                     <label>Fecha inicio</label>
                      <input type="date" formControlName="fecha_inicio" [min]="minFechaInicio" />
-                    @if (obtenerError('fecha_inicio')) {
-                    <p class="error"> {{ obtenerError('fecha_inicio') }}</p>}
-                </div>
+                     @if (obtenerError('fecha_inicio')) {
+                     <p class="error"> {{ obtenerError('fecha_inicio') }}</p>}
+                     @if (mensajeErrorFechaInicio) {
+                     <p class="error">{{ mensajeErrorFechaInicio }}</p>
+                     }
+                 </div>
 
                 <div class="input-group">
                     <label>Fecha fin</label>
                      <input type="date" formControlName="fecha_fin" [min]="fechaMinima" />
-                     @if (obtenerError('fecha_fin')) {
-                     <p class="error"> {{ obtenerError('fecha_fin') }}</p>}
-                     @if (mensajeErrorFechas) {
-                     <p class="error">{{ mensajeErrorFechas }}</p>
-                     }
+                      @if (obtenerError('fecha_fin')) {
+                      <p class="error"> {{ obtenerError('fecha_fin') }}</p>}
+                      @if (mensajeErrorFechaFin) {
+                      <p class="error">{{ mensajeErrorFechaFin }}</p>
+                      }
                  </div>
 
                 <div class="input-group">
@@ -72,9 +75,14 @@
                      <input formControlName="estado_campania" readonly />
                  </div>
 
-                <button type="submit" class="submit-btn">
-                    {{ modoEdicion ? 'Actualizar' : 'Crear' }}
-                </button>
+                 <div class="form-actions">
+                     <button type="button" class="cancel-btn" (click)="cancelar()">
+                         Cancelar
+                     </button>
+                     <button type="submit" class="submit-btn">
+                         {{ modoEdicion ? 'Actualizar' : 'Crear' }}
+                     </button>
+                 </div>
             </form>
         </div>
     </div>

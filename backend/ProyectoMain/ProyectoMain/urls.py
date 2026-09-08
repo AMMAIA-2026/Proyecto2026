@@ -1,10 +1,13 @@
-from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 from usuarios.views import CustomTokenObtainPairView
 
+handler400 = 'ProyectoMain.error_handlers.bad_request'
+handler403 = 'ProyectoMain.error_handlers.permission_denied'
+handler404 = 'ProyectoMain.error_handlers.page_not_found'
+handler500 = 'ProyectoMain.error_handlers.server_error'
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('usuarios/', include('usuarios.urls')),
     path('inscripciones/', include('inscripciones.urls')),
     path('campanias/', include('campanias.urls')),

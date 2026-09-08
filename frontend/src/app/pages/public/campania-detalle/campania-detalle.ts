@@ -38,13 +38,7 @@ export class CampaniaDetalle implements OnInit {
       next: (data: Campania) => {
         this.campania = data;
         this.cargando = false;
-
-        this.inscripcionService.getTotalInscriptos(this.campania.id).subscribe({
-          next: (respuesta) => {
-            this.inscriptosCount = respuesta.totalInscriptos;
-            this.cdr.detectChanges();
-          }
-        });
+        this.inscriptosCount = data.total_inscriptos;
         this.cdr.detectChanges();
 
       },

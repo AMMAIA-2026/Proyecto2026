@@ -63,7 +63,10 @@ export class UsuarioModal implements OnChanges {
       return;
     }
     this.cargando = true;
-    this.usuarioService.editarUsuario(this.usuario.id, this.editForm.value).subscribe({
+    this.usuarioService.editarUsuario(this.usuario.id, {
+      ...this.editForm.value,
+      username: this.usuario.username,
+    }).subscribe({
       next: () => {
 
         this.cargando = false;

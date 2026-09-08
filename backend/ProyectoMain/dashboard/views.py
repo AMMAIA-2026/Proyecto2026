@@ -1,5 +1,5 @@
 from datetime import datetime, time, timedelta
-from django.db.models import Case, Count, DateField, IntegerField, Value, When
+from django.db.models import Case, Count, DateField, F, IntegerField, Q, Value, When
 from django.db.models.functions import Cast, ExtractMonth, ExtractYear
 from django.utils import timezone
 from rest_framework.response import Response
@@ -83,8 +83,14 @@ class DashboardView(APIView):
         ]
         campanias_recientes = (
             Campania.objects.select_related('centro_salud')
-            .filter(fecha_fin__gte=hoy)
             .annotate(total_inscriptos_anotado=Count('inscripcion'))
+            .filter(
+                fecha_fin__gte=hoy,
+            )
+            .filter(
+                Q(cupo_maximo__isnull=True)
+                | Q(total_inscriptos_anotado__lt=F('cupo_maximo'))
+            )
             .annotate(
                 prioridad=Case(
                     When(fecha_inicio__lte=hoy, then=Value(0)),

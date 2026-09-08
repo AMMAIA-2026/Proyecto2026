@@ -3,20 +3,10 @@ from django.db.models import Count
 from rest_framework import status
 from .models import Campania
 from .serializers import CampaniaSerializer
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from usuarios.permissions import EsAdministrador
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def campania_activa(request):
-    campania = Campania.objects.order_by('fecha_inicio').first()
-    if not campania:
-        return Response({'error': 'No hay campañas.'}, status=404)
-    return Response(CampaniaSerializer(campania).data)
-
 
 class CampaniaListCreateView(APIView):
     def get_permissions(self):
@@ -60,17 +50,6 @@ class CampaniaDetailView(APIView):
     def put(self, request, campania_id):
         campania = self.get_object(campania_id)
         serializer = CampaniaSerializer(campania, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    def patch(self, request, campania_id):
-        campania = self.get_object(campania_id)
-        serializer = CampaniaSerializer(
-            campania,
-            data=request.data,
-            partial=True,
-        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
