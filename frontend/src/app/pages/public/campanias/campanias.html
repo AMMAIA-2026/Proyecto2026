@@ -24,17 +24,17 @@
     </div>
 </div>
 
-@if (cargando) {
+@if (cargando()) {
     <p class="campanias__mensaje">Cargando campañas...</p>
 }
 
-@if (error) {
-    <p class="campanias__error">{{ error }}</p>
+@if (error()) {
+    <p class="campanias__error">{{ error() }}</p>
 }
 
-@if (!cargando && !error) {
+@if (!cargando() && !error()) {
     <div class="campanias__grid">
-    @for (campania of campaniasFiltradas; track campania.id) {
+    @for (campania of campaniasFiltradas(); track campania.id) {
         <article class="card">
 
         <div class="card__imagen">

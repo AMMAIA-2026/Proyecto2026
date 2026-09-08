@@ -1,18 +1,15 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
-import {
-  CampaniaService,
-  CentroSalud
-} from '../../../../services/campanias/campania.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CentroSalud } from '../../../../models/campania.model';
+import { CampaniaService } from '../../../../services/campanias/campania.service';
 
 
 @Component({
   selector: 'app-campania-form',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './campania-form.html',
   styleUrls: ['./campania-form.css']
@@ -57,11 +54,9 @@ export class CampaniaForm implements OnInit {
   };
 
   private fb = inject(FormBuilder);
-  private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private campaniaService = inject(CampaniaService);
-  private cdr = inject(ChangeDetectorRef);
 
   constructor() {
     this.campaniaForm = this.fb.group({
@@ -85,7 +80,7 @@ export class CampaniaForm implements OnInit {
       estado_campania: [{ value: '', disabled: true }]
     });
 
-    this.campaniaForm.valueChanges.subscribe(() => {
+    this.campaniaForm.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
       this.actualizarEstado();
     });
   }
@@ -107,7 +102,6 @@ export class CampaniaForm implements OnInit {
     this.campaniaService.getCentrosSalud().subscribe({
       next: centros => {
         this.centrosSalud = centros;
-        this.cdr.detectChanges();
       },
       error: () => {
         this.errorCentros = 'No se pudieron cargar los centros de salud.';
@@ -139,11 +133,9 @@ export class CampaniaForm implements OnInit {
           cupo_maximo: data.cupo_maximo
         });
         this.actualizarEstado();
-        this.cdr.detectChanges();
       },
       error: () => {
         this.errorCentros = 'No se pudieron recuperar los datos de la campaña.';
-        this.cdr.detectChanges();
       }
     });
   }
@@ -263,10 +255,7 @@ export class CampaniaForm implements OnInit {
     };
 
     if (this.modoEdicion) {
-      this.http.put(
-        `http://localhost:8000/campanias/${this.campaniaId}/`,
-        data
-      ).subscribe(() => {
+      this.campaniaService.editarCampania(this.campaniaId!, data).subscribe(() => {
         Swal.fire({
           title: 'Campaña actualizada',
           text: 'La campaña ha sido actualizada correctamente',
@@ -283,10 +272,7 @@ export class CampaniaForm implements OnInit {
       });
 
     } else {
-      this.http.post(
-        'http://localhost:8000/campanias/',
-        data
-      ).subscribe(() => {
+      this.campaniaService.crearCampania(data).subscribe(() => {
         Swal.fire({
           title: 'Campaña creada',
           text: 'La campaña ha sido creada correctamente',

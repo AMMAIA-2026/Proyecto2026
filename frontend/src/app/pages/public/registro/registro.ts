@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../../services/auth/auth';
 import {
   passwordsCoinciden,
   validadoresPassword
@@ -11,7 +11,6 @@ import { advertenciaEdad } from '../../../validators/edad.validator';
 
 @Component({
   selector: 'app-registro',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './registro.html',
   styleUrl: './registro.css'
@@ -35,8 +34,8 @@ export class Registro {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
   ) {
     this.registroForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -70,7 +69,7 @@ export class Registro {
 
     const { confirmar_password, ...datosRegistro } = this.registroForm.getRawValue();
 
-    this.http.post('http://localhost:8000/usuarios/registro/', datosRegistro).subscribe({
+    this.authService.registrar(datosRegistro).subscribe({
       next: () => {
         this.cargando = false;
         Swal.fire({

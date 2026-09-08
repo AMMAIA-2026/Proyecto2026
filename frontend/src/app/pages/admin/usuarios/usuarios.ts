@@ -1,27 +1,26 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { UsuarioService } from '../../../services/usuario/usuario.service';
 import { UsuarioModal } from './usuario-modal/usuario-modal';
 import { FormsModule } from '@angular/forms';
+import { Usuario } from '../../../models/usuario.model';
 
 @Component({
   selector: 'app-usuarios',
-  standalone: true,
   imports: [UsuarioModal, FormsModule],
   templateUrl: './usuarios.html',
   styleUrl: './usuarios.css'
 })
 export class Usuarios implements OnInit {
 
-  usuarios: any[] = [];
+  usuarios = signal<Usuario[]>([]);
   textoBusqueda = '';
-  usuarioSeleccionado: any = null;
-  usuariosOriginales: any[] = [];
+  usuarioSeleccionado: Usuario | null = null;
+  usuariosOriginales: Usuario[] = [];
   modoModal: 'ver' | 'editar' | 'eliminar' = 'ver';
   mostrarModal = false;
 
   constructor(
-    private usuarioService: UsuarioService,
-    private cdr: ChangeDetectorRef
+    private usuarioService: UsuarioService
   ) { }
 
   ngOnInit(): void {
@@ -31,15 +30,14 @@ export class Usuarios implements OnInit {
   cargarUsuarios(): void {
     this.usuarioService.getUsuarios().subscribe({
       next: (data) => {
-        this.usuarios = data;
+        this.usuarios.set(data);
         this.usuariosOriginales = [...data];
-        this.cdr.detectChanges();
       },
       error: (err) => console.error('ERROR:', err)
     });
   }
 
-  abrirModal(usuario: any, modo: 'ver' | 'editar' | 'eliminar'): void {
+  abrirModal(usuario: Usuario, modo: 'ver' | 'editar' | 'eliminar'): void {
     this.usuarioSeleccionado = usuario;
     this.modoModal = modo;
     this.mostrarModal = true;
@@ -55,15 +53,15 @@ export class Usuarios implements OnInit {
     const texto = this.textoBusqueda.toLowerCase().trim();
 
     if (!texto) {
-      this.usuarios = [...this.usuariosOriginales];
+      this.usuarios.set([...this.usuariosOriginales]);
       return;
     }
 
-    this.usuarios = this.usuariosOriginales.filter(usuario =>
+    this.usuarios.set(this.usuariosOriginales.filter(usuario =>
       usuario.nombre?.toLowerCase().includes(texto) ||
       usuario.apellido?.toLowerCase().includes(texto) ||
       usuario.email?.toLowerCase().includes(texto) ||
       usuario.dni?.toString().includes(texto)
-    );
+    ));
   }
 }

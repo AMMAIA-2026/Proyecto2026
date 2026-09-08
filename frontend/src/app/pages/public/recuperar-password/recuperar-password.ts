@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -8,11 +8,11 @@ import {
   passwordsCoinciden,
   validadoresPassword
 } from '../../../validators/password.validators';
+import { AuthService } from '../../../services/auth/auth';
 
 
 @Component({
   selector: 'app-recuperar-password',
-  standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './recuperar-password.html',
   styleUrls: ['../login/login.css', './recuperar-password.css']
@@ -24,8 +24,8 @@ export class RecuperarPassword {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -45,10 +45,7 @@ export class RecuperarPassword {
     this.enviando = true;
     const { confirmar_password, ...datosRecuperacion } = this.form.getRawValue();
 
-    this.http.post<{ message: string }>(
-      'http://localhost:8000/usuarios/recuperar-password/',
-      datosRecuperacion
-    ).subscribe({
+    this.authService.recuperarPassword(datosRecuperacion).subscribe({
       next: respuesta => {
         this.enviando = false;
         Swal.fire({

@@ -6,7 +6,7 @@
   <div class="card-estadistica">
 
     <div>
-      <h2>{{ usuarios.length }}</h2>
+      <h2>{{ usuarios().length }}</h2>
       <p>Usuarios Registrados</p>
     </div>
 
@@ -46,7 +46,7 @@
   </div>
 
 
-  @for (usuario of usuarios; track usuario.id) {
+  @for (usuario of usuarios(); track usuario.id) {
 
   <div class="usuario-card">
 

@@ -6,7 +6,6 @@ import { advertenciaEdad } from '../../../../validators/edad.validator';
 
 @Component({
   selector: 'app-usuario-modal',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './usuario-modal.html',
   styleUrl: './usuario-modal.css'

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
 
@@ -7,7 +7,6 @@ import { ContactoService } from '../../../services/contactos/contacto.service';
 
 @Component({
   selector: 'app-contactanos',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './contactanos.html',
   styleUrl: './contactanos.css'
@@ -18,8 +17,7 @@ export class Contactanos {
 
   constructor(
     private contactoService: ContactoService,
-    private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private fb: FormBuilder
   ) {
     this.contactoForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -37,7 +35,6 @@ export class Contactanos {
       next: () => {
         this.enviando = false;
         this.contactoForm.reset();
-        this.cdr.detectChanges();
         Swal.fire({
           icon: 'success',
           title: 'Mensaje enviado',
@@ -47,7 +44,6 @@ export class Contactanos {
       },
       error: () => {
         this.enviando = false;
-        this.cdr.detectChanges();
         Swal.fire({
           icon: 'error',
           title: 'No pudimos enviar el mensaje',

@@ -3,7 +3,6 @@ import { RouterOutlet, RouterLink, RouterLinkActive, Router  } from '@angular/ro
 
 @Component({
     selector: 'app-admin-layout',
-    standalone: true,
     imports: [
         RouterOutlet, 
         RouterLink, 

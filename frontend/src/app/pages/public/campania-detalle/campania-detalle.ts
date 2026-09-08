@@ -1,30 +1,29 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Campania, CampaniaService } from '../../../services/campanias/campania.service';
+import { Campania } from '../../../models/campania.model';
+import { CampaniaService } from '../../../services/campanias/campania.service';
 import { InscripcionService } from '../../../services/inscripciones/inscripcion.service';
 import { AuthService } from '../../../services/auth/auth';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-campania-detalle',
-  standalone: true,
   imports: [],
   templateUrl: './campania-detalle.html',
   styleUrl: './campania-detalle.css'
 })
 export class CampaniaDetalle implements OnInit {
 
-  campania: Campania | null = null;
-  cargando: boolean = true;
-  error: string = '';
-  inscriptosCount = 0;
+  campania = signal<Campania | null>(null);
+  cargando = signal(true);
+  error = signal('');
+  inscriptosCount = signal(0);
 
   constructor(
     private campaniaService: CampaniaService,
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef,
     private inscripcionService: InscripcionService,
     private authService: AuthService
   ) { }
@@ -36,26 +35,25 @@ export class CampaniaDetalle implements OnInit {
 
     obs.subscribe({
       next: (data: Campania) => {
-        this.campania = data;
-        this.cargando = false;
-        this.inscriptosCount = data.total_inscriptos;
-        this.cdr.detectChanges();
+        this.campania.set(data);
+        this.cargando.set(false);
+        this.inscriptosCount.set(data.total_inscriptos);
 
       },
 
       error: (err: any) => {
-        this.error = 'No se pudo cargar la campaña.';
-        this.cargando = false;
-        this.cdr.detectChanges();
+        this.error.set('No se pudo cargar la campaña.');
+        this.cargando.set(false);
       }
     });
 
   }
 
   getEstado(): string {
-    if (!this.campania) return '';
-    if (this.campania.estado_calculado === 'Proximamente') return 'Proxima';
-    if (this.campania.estado_calculado === 'Activa') return 'En Curso';
+    const campania = this.campania();
+    if (!campania) return '';
+    if (campania.estado_calculado === 'Proximamente') return 'Proxima';
+    if (campania.estado_calculado === 'Activa') return 'En Curso';
     return 'Finalizada';
   }
 
@@ -66,7 +64,8 @@ export class CampaniaDetalle implements OnInit {
   }
 
   inscribirse() {
-    if (!this.campania) {
+    const campania = this.campania();
+    if (!campania) {
       return;
     }
 
@@ -82,11 +81,10 @@ export class CampaniaDetalle implements OnInit {
       return;
     };
 
-    this.inscripcionService.inscribirse(this.campania.id).subscribe({
+    this.inscripcionService.inscribirse(campania.id).subscribe({
 
       next: (respuesta) => {
-        this.inscriptosCount = respuesta.totalInscriptos;
-        this.cdr.detectChanges();
+        this.inscriptosCount.set(respuesta.totalInscriptos);
         Swal.fire({
           icon: 'success',
           title: 'Inscripción exitosa',

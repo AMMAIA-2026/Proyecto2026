@@ -1,10 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, signal } from '@angular/core';
-
-import {
-  Contacto,
-  ContactoService
-} from '../../../services/contactos/contacto.service';
+import { Contacto } from '../../../models/contacto.model';
+import { ContactoService } from '../../../services/contactos/contacto.service';
 
 
 type FiltroContacto = 'todos' | 'pendientes' | 'revisados';
@@ -13,7 +10,6 @@ type OrdenContacto = 'prioridad' | 'recientes' | 'antiguos';
 
 @Component({
   selector: 'app-contactos-admin',
-  standalone: true,
   imports: [DatePipe],
   templateUrl: './contactos.html',
   styleUrl: './contactos.css'

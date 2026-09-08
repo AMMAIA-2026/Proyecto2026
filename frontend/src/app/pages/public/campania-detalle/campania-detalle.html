@@ -1,14 +1,14 @@
 <div class="detalle-wrapper">
 
-@if (cargando) {
+@if (cargando()) {
     <div class="estado-mensaje">Cargando campaña...</div>
 }
 
-@if (error) {
-    <div class="estado-error">{{ error }}</div>
+@if (error()) {
+    <div class="estado-error">{{ error() }}</div>
 }
 
-@if (!cargando && !error && campania) {
+@if (!cargando() && !error() && campania(); as campania) {
     <div class="detalle-card">
 
     <div class="detalle-banner">
@@ -92,7 +92,7 @@
             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
             <div>
-            <span class="inscritos-numero">{{ inscriptosCount }}</span>
+            <span class="inscritos-numero">{{ inscriptosCount() }}</span>
             <span class="inscritos-label">Personas Inscritas</span>
             <span class="inscritos-label">
                 Cupo: {{ campania.cupo_maximo ?? 'Sin límite' }}

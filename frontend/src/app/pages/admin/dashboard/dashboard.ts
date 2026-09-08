@@ -1,32 +1,16 @@
 import { Component, inject } from '@angular/core';
-import { Dashboard, DashboardService } from '../../../services/dashboard/dashboard.service';
+import {
+  CampaniaGrafico,
+  DashboardViewModel,
+  DonantesGrafico,
+} from '../../../models/dashboard.model';
+import { DashboardService } from '../../../services/dashboard/dashboard.service';
 import { map, shareReplay } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 
-interface CampaniaGrafico {
-  estado: string;
-  count: number;
-  porcentaje: number;
-  color: string;
-}
-
-interface DonantesGrafico {
-  clave: string;
-  mes: string;
-  donantes: number;
-  altura: number;
-}
-
-interface DashboardViewModel extends Dashboard {
-  campanias_por_tipo: CampaniaGrafico[];
-  conicGradient: string;
-  meses: DonantesGrafico[];
-}
-
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
   imports: [AsyncPipe],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']

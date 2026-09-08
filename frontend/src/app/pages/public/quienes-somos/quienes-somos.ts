@@ -1,22 +1,21 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, DestroyRef, OnInit, signal } from '@angular/core';
 import * as AOS from 'aos';
 
 @Component({
     selector: 'app-quienes-somos',
-    standalone: true,
     templateUrl: './quienes-somos.html',
     styleUrls: ['./quienes-somos.css']
 })
 
 export class QuienesSomos implements OnInit {
 
-    constructor(private cdr: ChangeDetectorRef) {}
+    constructor(private destroyRef: DestroyRef) {}
 
     missionTypes: string[] = ['A+', 'B+', 'AB+', 'O+'];
     visionTypes: string[] = ['O-', 'A-', 'B-', 'AB-'];
 
-    currentMissionType: string = 'A+';
-    currentVisionType: string = 'O-';
+    currentMissionType = signal('A+');
+    currentVisionType = signal('O-');
 
     private missionIndex = 0;
     private visionIndex = 0;
@@ -28,18 +27,20 @@ export class QuienesSomos implements OnInit {
             once: true
         });
 
-        setInterval(() => {
+        const missionTimer = setInterval(() => {
             this.missionIndex = (this.missionIndex + 1) % this.missionTypes.length;
-            this.currentMissionType = this.missionTypes[this.missionIndex];
-            this.cdr.detectChanges();
+            this.currentMissionType.set(this.missionTypes[this.missionIndex]);
         }, 2500);
 
-        setInterval(() => {
+        const visionTimer = setInterval(() => {
             this.visionIndex = (this.visionIndex + 1) % this.visionTypes.length;
-            this.currentVisionType = this.visionTypes[this.visionIndex];
-            this.cdr.detectChanges();
+            this.currentVisionType.set(this.visionTypes[this.visionIndex]);
         }, 3000);
 
+        this.destroyRef.onDestroy(() => {
+            clearInterval(missionTimer);
+            clearInterval(visionTimer);
+        });
     }
 
 }

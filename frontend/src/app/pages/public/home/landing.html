@@ -59,17 +59,17 @@
     <section class="campaigns" id="campanas">
     <h2>Campañas de donación destacadas</h2>
 
-@if (cargando) {
+@if (cargando()) {
     <p class="mensaje_cargando">Cargando campañas...</p>
 }
 
-@if (error) {
-    <p class="mensaje-error">{{ error }}</p>
+@if (error()) {
+    <p class="mensaje-error">{{ error() }}</p>
 }
 
-@if (!cargando && !error) {
+@if (!cargando() && !error()) {
     <div class="campaigns__grid">
-    @for (c of campanias; track c.id) {
+    @for (c of campanias(); track c.id) {
         <article class="card">
 
         <div class="card__img">
@@ -113,7 +113,7 @@
         </article>
     }
 
-        @if (campanias.length === 0) {
+        @if (campanias().length === 0) {
         <p class="campanias_vacio">
             No hay campañas activas en este momento.
         </p>
