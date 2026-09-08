@@ -1,9 +1,8 @@
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
-from .views import CentroSaludViewSet
+from .views import CentroSaludListView
 
 
-router = DefaultRouter()
-router.register(r'', CentroSaludViewSet, basename='centro-salud')
-
-urlpatterns = router.urls
+urlpatterns = [
+    path('', CentroSaludListView.as_view(), name='centro-salud-list'),
+]

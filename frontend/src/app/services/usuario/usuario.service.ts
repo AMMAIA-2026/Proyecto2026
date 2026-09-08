@@ -20,7 +20,7 @@ export class UsuarioService {
   }
 
   editarUsuario(id: number, datos: any) {
-    return this.http.patch(`${this.apiUrl}${id}/`, datos, { headers: this.headers() });
+    return this.http.put(`${this.apiUrl}${id}/`, datos, { headers: this.headers() });
   }
 
   eliminarUsuario(id: number) {

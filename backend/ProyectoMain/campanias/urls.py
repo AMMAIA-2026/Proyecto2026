@@ -1,9 +1,8 @@
 from django.urls import path
-from .views import CampaniaDetailView, CampaniaListCreateView, campania_activa
+from .views import CampaniaDetailView, CampaniaListCreateView
 
 
 urlpatterns = [
-    path('activa/', campania_activa),
     path('', CampaniaListCreateView.as_view(), name='campania-list-create'),
     path(
         '<int:campania_id>/',

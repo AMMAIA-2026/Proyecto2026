@@ -40,6 +40,11 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     password = campo_password()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance is not None:
+            self.fields['password'].required = False
+
     class Meta:
         model = Usuario
         fields = [
@@ -98,7 +103,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         if user is None:
             raise serializers.ValidationError(
-                'Credenciales incorrectas'
+                'Credenciales incorrectas',
+                code='credenciales_incorrectas',
             )
 
         refresh = self.get_token(user)

@@ -1,12 +1,17 @@
-from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import CentroSalud
 from .serializers import CentroSaludSerializer
 
 
-class CentroSaludViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = CentroSalud.objects.all()
-    serializer_class = CentroSaludSerializer
+class CentroSaludListView(APIView):
     permission_classes = [AllowAny]
-    lookup_value_regex = r'\d+'
+
+    def get(self, request):
+        serializer = CentroSaludSerializer(
+            CentroSalud.objects.all(),
+            many=True,
+        )
+        return Response(serializer.data)
