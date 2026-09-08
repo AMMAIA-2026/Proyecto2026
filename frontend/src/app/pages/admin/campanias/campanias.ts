@@ -1,26 +1,26 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { signal } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DatePipe } from '@angular/common';
+import { Campania } from '../../../models/campania.model';
+import { CampaniaService } from '../../../services/campanias/campania.service';
 
 
 @Component({
   selector: 'app-campanias-admin',
-  standalone: true,
   imports: [DatePipe],
   templateUrl: './campanias.html',
   styleUrls: ['./campanias.css']
 })
 export class AdminCampanias implements OnInit {
 
-  campanias = signal<any[]>([]);
+  campanias = signal<Campania[]>([]);
 
   error = '';
 
   constructor(
-  private http: HttpClient,
+  private campaniaService: CampaniaService,
   private router: Router
 ) {}
 
@@ -29,9 +29,7 @@ export class AdminCampanias implements OnInit {
   }
 
   cargarCampanias() {
-    this.http.get<any[]>(
-      'http://localhost:8000/campanias/'
-    ).subscribe({
+    this.campaniaService.getCampanias().subscribe({
 
       next: (data) => {
         this.campanias.set(data);
@@ -68,9 +66,7 @@ export class AdminCampanias implements OnInit {
 
     if (!result.isConfirmed) return;
 
-    this.http.delete(
-      `http://localhost:8000/campanias/${id}/`
-    ).subscribe({
+    this.campaniaService.eliminarCampania(id).subscribe({
 
       next: () => {
 

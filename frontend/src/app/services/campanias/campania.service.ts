@@ -2,6 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import {
+  Campania,
+  CampaniaPayload,
+  CentroSalud,
+} from '../../models/campania.model';
 
 export const CENTRO_SALUD_MAX_LENGTH = {
   nombre: 100,
@@ -11,33 +16,6 @@ export const CENTRO_SALUD_MAX_LENGTH = {
   telefono: 10,
   sitio_web: 200
 } as const;
-
-export interface CentroSalud {
-  id: number;
-  nombre: string;
-  direccion: string;
-  barrio: string;
-  localidad: string;
-  telefono: string | null;
-  sitio_web: string | null;
-  latitud: string;
-  longitud: string;
-}
-
-export interface Campania {
-  id: number;
-  titulo: string;
-  descripcion: string;
-  ubicacion: string;
-  centro_salud: number | null;
-  centro_salud_detalle: CentroSalud | null;
-  fecha_inicio: string;
-  fecha_fin: string;
-  cupo_maximo: number | null;
-  total_inscriptos: number;
-  estado_calculado: string;
-  estado?: string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -72,6 +50,18 @@ export class CampaniaService {
     return this.http.get<CentroSalud[]>(
       'http://localhost:8000/centros-salud/'
     );
+  }
+
+  crearCampania(data: CampaniaPayload): Observable<Campania> {
+    return this.http.post<Campania>(this.apiUrl, data);
+  }
+
+  editarCampania(id: number, data: CampaniaPayload): Observable<Campania> {
+    return this.http.put<Campania>(`${this.apiUrl}${id}/`, data);
+  }
+
+  eliminarCampania(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}${id}/`);
   }
 
   private formatearFecha(fecha: string): string {

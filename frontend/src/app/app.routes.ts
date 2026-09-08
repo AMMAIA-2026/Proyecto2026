@@ -53,7 +53,6 @@ export const routes: Routes = [
             { path: 'usuarios', component: Usuarios},
             { path: 'campanias/nueva', component: CampaniaForm },
             { path: 'campanias/editar/:id', component: CampaniaForm },
-            { path: 'usuarios', component: Usuarios },
             { path: 'contactos', component: ContactosAdmin },
         ]
     },

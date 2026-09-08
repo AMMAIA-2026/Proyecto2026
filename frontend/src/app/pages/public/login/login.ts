@@ -8,13 +8,10 @@ import {
   Validators
 } from '@angular/forms';
 
-import { HttpClient } from '@angular/common/http';
-
 
 @Component({
   selector: 'app-login',
 
-  standalone: true,
 
   imports: [
     ReactiveFormsModule,
@@ -35,7 +32,6 @@ export class Login {
   constructor(
 
     private fb: FormBuilder,
-    private http: HttpClient,
     private router: Router,
     private authService: AuthService
 
@@ -73,13 +69,10 @@ export class Login {
       return;
     }
 
-    this.http.post(
-      'http://127.0.0.1:8000/api/token/',
-      {
-        email: this.loginForm.value.email,
-        password: this.loginForm.value.password
-      }
-    ).subscribe({
+    this.authService.iniciarSesion({
+      email: this.loginForm.value.email,
+      password: this.loginForm.value.password,
+    }).subscribe({
 
       next: (response: any) => {
         
