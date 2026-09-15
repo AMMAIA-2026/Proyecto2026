@@ -50,6 +50,12 @@ export class AdminCampanias implements OnInit {
     this.router.navigate(['/admin/campanias/editar', id]);
   }
 
+  verInscripciones(id: number): void {
+    this.router.navigate(['/admin/inscripciones'], {
+      queryParams: { campania: id },
+    });
+  }
+
   
   eliminarCampania(id: number) {
 

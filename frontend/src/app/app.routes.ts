@@ -17,6 +17,7 @@ import { CampaniaForm } from './pages/admin/campanias/campania-form/campania-for
 import { RecuperarPassword } from './pages/public/recuperar-password/recuperar-password';
 import { ContactosAdmin } from './pages/admin/contactos/contactos';
 import { Contactanos } from './pages/public/contactanos/contactanos';
+import { MisInscripciones } from './pages/public/mis-inscripciones/mis-inscripciones';
 
 
 
@@ -36,6 +37,7 @@ export const routes: Routes = [
             { path: 'registro', component: Registro },
             { path: 'informate', component: Informate },
             { path: 'contactanos', component: Contactanos },
+            { path: 'mis-inscripciones', component: MisInscripciones },
 
         ]
     },

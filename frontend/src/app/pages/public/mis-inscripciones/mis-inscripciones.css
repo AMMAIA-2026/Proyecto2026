@@ -1,0 +1,230 @@
+.inscripciones-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 52px 32px 72px;
+  color: var(--text);
+}
+
+.inscripciones-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.eyebrow {
+  color: var(--red);
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.inscripciones-header h1 {
+  margin: 8px 0;
+  font-size: 2.35rem;
+}
+
+.inscripciones-header p,
+.seccion-titulo p,
+.historica-item p {
+  margin: 0;
+  color: var(--text-mid);
+}
+
+.explorar-btn,
+.cancelar-btn {
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 99px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.explorar-btn {
+  color: white;
+  background: var(--red);
+}
+
+.explorar-btn:hover,
+.cancelar-btn:hover {
+  background: var(--red-dark);
+}
+
+.inscripciones-seccion {
+  margin-bottom: 38px;
+}
+
+.seccion-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.seccion-titulo h2 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+}
+
+.seccion-titulo p {
+  font-size: .85rem;
+}
+
+.inscripciones-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.inscripcion-card,
+.historicas-lista {
+  background: white;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+}
+
+.inscripcion-card {
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+}
+
+.card-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--text-light);
+  font-size: .75rem;
+}
+
+.estado-badge {
+  padding: 5px 9px;
+  color: #27633a;
+  background: #e4f5e9;
+  border-radius: 99px;
+  font-weight: 800;
+}
+
+.inscripcion-card h3,
+.historica-item h3 {
+  margin: 18px 0 8px;
+  font-size: 1.05rem;
+}
+
+.ubicacion,
+.fechas,
+.centro {
+  margin: 0 0 7px;
+  color: var(--text-mid);
+  font-size: .86rem;
+}
+
+.centro {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.cancelar-btn {
+  align-self: flex-start;
+  margin-top: 14px;
+  color: var(--red);
+  background: var(--red-light);
+}
+
+.cancelar-btn:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+.historicas-lista {
+  overflow: hidden;
+}
+
+.historica-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+}
+
+.historica-item:last-child {
+  border-bottom: 0;
+}
+
+.historica-item h3 {
+  margin: 0 0 5px;
+}
+
+.historica-fecha {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 5px;
+  color: var(--text-mid);
+  font-size: .8rem;
+}
+
+.historica-fecha strong {
+  color: var(--red);
+}
+
+.estado {
+  padding: 40px;
+  color: var(--text-mid);
+  text-align: center;
+}
+
+.estado--error {
+  color: var(--red);
+}
+
+.estado--card {
+  grid-column: 1 / -1;
+  margin: 0;
+  background: white;
+  border-radius: 16px;
+}
+
+@media (max-width: 800px) {
+  .inscripciones-header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .inscripciones-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .inscripciones-page {
+    padding: 36px 18px 56px;
+  }
+
+  .inscripciones-header h1 {
+    font-size: 2rem;
+  }
+
+  .inscripciones-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .explorar-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .historica-item {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .historica-fecha {
+    align-items: start;
+  }
+}
