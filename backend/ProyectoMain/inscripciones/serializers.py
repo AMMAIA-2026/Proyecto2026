@@ -15,6 +15,8 @@ class InscripcionSerializer(serializers.ModelSerializer):
         ]
 
         read_only_fields = [
+            'id',
+            'campania',
             'usuario',
             'fecha_inscripcion'
         ]

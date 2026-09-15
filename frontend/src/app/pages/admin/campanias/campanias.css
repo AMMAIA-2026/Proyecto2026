@@ -187,8 +187,14 @@ td {
     cursor: pointer;
 }
 
+.acciones {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+}
+
 .editar-btn {
-    margin-right: 8px;
     background: #fada83;
     color: #473903
 }

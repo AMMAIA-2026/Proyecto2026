@@ -1,14 +1,14 @@
 <div class="detalle-wrapper">
 
-@if (cargando) {
+@if (cargando()) {
     <div class="estado-mensaje">Cargando campaña...</div>
 }
 
-@if (error) {
-    <div class="estado-error">{{ error }}</div>
+@if (error()) {
+    <div class="estado-error">{{ error() }}</div>
 }
 
-@if (!cargando && !error && campania) {
+@if (!cargando() && !error() && campania(); as campania) {
     <div class="detalle-card">
 
     <div class="detalle-banner">
@@ -92,12 +92,50 @@
             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
             <div>
-            <span class="inscritos-numero">{{ inscriptosCount }}</span>
+            <span class="inscritos-numero">{{ inscriptosCount() }}</span>
             <span class="inscritos-label">Personas Inscritas</span>
+            <span class="inscritos-label">
+                Cupo: {{ campania.cupo_maximo ?? 'Sin límite' }}
+            </span>
             </div>
         </div>
 
         </div>
+
+        @if (campania.centro_salud_detalle; as centro) {
+        <section class="centro-salud">
+            <div class="centro-salud__encabezado">
+                <div>
+                    <span class="centro-salud__etiqueta">Centro de salud asociado</span>
+                    <h2>{{ centro.nombre }}</h2>
+                </div>
+                <a
+                    class="centro-salud__mapa"
+                    [href]="'https://www.openstreetmap.org/?mlat=' + centro.latitud + '&mlon=' + centro.longitud + '#map=17/' + centro.latitud + '/' + centro.longitud"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >Cómo llegar</a>
+            </div>
+
+            <p>{{ centro.direccion }}, {{ centro.barrio }}, {{ centro.localidad }}</p>
+            @if (centro.telefono) {
+            <p>
+                <strong>Teléfono:</strong>
+                <a class="centro-salud__telefono" [href]="'tel:+54' + centro.telefono">
+                    {{ centro.telefono }}
+                </a>
+            </p>
+            }
+            @if (centro.sitio_web) {
+            <a
+                class="centro-salud__web"
+                [href]="centro.sitio_web"
+                target="_blank"
+                rel="noopener noreferrer"
+            >Visitar sitio oficial</a>
+            }
+        </section>
+        }
 
         <div class="detalle-descripcion">
         <h2 class="descripcion-titulo">Descripción</h2>

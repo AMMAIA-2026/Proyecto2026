@@ -1,0 +1,50 @@
+<section class="contact-page">
+  <div class="contact-intro">
+    <span class="eyebrow">Estamos para ayudarte</span>
+    <h1>Contactanos</h1>
+    <p>Escribinos tu consulta y el equipo de SangreYa la revisará a la brevedad.</p>
+
+    <div class="contact-note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+        <path d="m3 7 9 6 9-6"></path>
+      </svg>
+      <span>Tu mensaje ingresará directamente a nuestra bandeja de atención.</span>
+    </div>
+  </div>
+
+  <form class="contact-form" [formGroup]="contactoForm" (ngSubmit)="enviar()">
+    <div class="field">
+      <label for="contacto-email">Email</label>
+      <input id="contacto-email" type="email" placeholder="tu@email.com" formControlName="email">
+      @if (contactoForm.get('email')?.invalid && contactoForm.get('email')?.touched) {
+      <small>
+        @if (contactoForm.get('email')?.errors?.['required']) { El email es obligatorio }
+        @if (contactoForm.get('email')?.errors?.['email']) { Ingresá un email válido }
+      </small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="contacto-asunto">Asunto</label>
+      <input id="contacto-asunto" type="text" maxlength="100" placeholder="¿En qué podemos ayudarte?" formControlName="asunto">
+      <span class="counter">{{ contactoForm.get('asunto')?.value?.length || 0 }}/100</span>
+      @if (contactoForm.get('asunto')?.invalid && contactoForm.get('asunto')?.touched) {
+      <small>El asunto es obligatorio y no puede superar 100 caracteres</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="contacto-mensaje">Mensaje</label>
+      <textarea id="contacto-mensaje" rows="7" maxlength="500" placeholder="Contanos tu consulta" formControlName="mensaje"></textarea>
+      <span class="counter">{{ contactoForm.get('mensaje')?.value?.length || 0 }}/500</span>
+      @if (contactoForm.get('mensaje')?.invalid && contactoForm.get('mensaje')?.touched) {
+      <small>El mensaje es obligatorio y no puede superar 500 caracteres</small>
+      }
+    </div>
+
+    <button type="submit" [disabled]="enviando">
+      {{ enviando ? 'Enviando...' : 'Enviar consulta' }}
+    </button>
+  </form>
+</section>

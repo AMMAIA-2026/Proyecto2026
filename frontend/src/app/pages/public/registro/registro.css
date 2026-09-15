@@ -136,3 +136,9 @@
 appearance: none;
 -webkit-appearance: none;
 }
+
+.advertencia-edad {
+    color: #9a6700;
+    font-size: 12px;
+    margin-top: 4px;
+}

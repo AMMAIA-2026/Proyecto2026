@@ -150,6 +150,70 @@
     margin-top: 2px;
 }
 
+.centro-salud {
+    padding: 18px 20px;
+    border: 1px solid #ead7d4;
+    border-radius: 14px;
+    background: #fffafa;
+}
+
+.centro-salud__encabezado {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.centro-salud__etiqueta {
+    display: block;
+    margin-bottom: 4px;
+    color: #a23a30;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.centro-salud h2 {
+    margin: 0;
+    color: #1a1a1a;
+    font-size: 1.05rem;
+}
+
+.centro-salud p {
+    margin: 10px 0 0;
+    color: #555;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.centro-salud__mapa,
+.centro-salud__web,
+.centro-salud__telefono {
+    color: #922B21;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.centro-salud__mapa {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    border: 1px solid #c9827a;
+    border-radius: 99px;
+}
+
+.centro-salud__web {
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.centro-salud__mapa:hover,
+.centro-salud__web:hover,
+.centro-salud__telefono:hover {
+    text-decoration: underline;
+}
+
 /* Descripción */
 .detalle-descripcion {
     display: flex;
@@ -201,4 +265,5 @@
     .detalle-cuerpo { padding: 20px 18px 28px; }
     .detalle-titulo { font-size: 1.3rem; }
     .stat-inscritos { min-width: unset; width: 100%; }
+    .centro-salud__encabezado { flex-direction: column; }
 }

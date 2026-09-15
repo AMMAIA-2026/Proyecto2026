@@ -153,6 +153,20 @@ input:focus {
   margin-top: 10px;
 }
 
+.forgot-link {
+  display: block;
+  margin: -10px 4px 18px;
+  color: #922B21;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: right;
+  text-decoration: none;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
+
 .submit-btn:hover {
 
   opacity: 0.9;
