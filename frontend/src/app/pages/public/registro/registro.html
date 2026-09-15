@@ -58,7 +58,12 @@
 
                 <div class="input-group">
                     <label>Contraseña</label>
-                    <input type="password" placeholder="Contraseña" formControlName="password">
+                    <div class="password-field">
+                        <input [type]="mostrarPassword ? 'text' : 'password'" placeholder="Contraseña" formControlName="password" autocomplete="new-password" (paste)="$event.preventDefault()" (drop)="$event.preventDefault()">
+                        <button type="button" class="password-toggle" [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="mostrarPassword" (click)="mostrarPassword = !mostrarPassword">
+                            {{ mostrarPassword ? 'Ocultar' : 'Mostrar' }}
+                        </button>
+                    </div>
                     @if (registroForm.get('password')?.invalid && registroForm.get('password')?.touched) {
                     <small class="error">
                         @if (registroForm.get('password')?.errors?.['required']) { La contraseña es obligatoria }
@@ -72,7 +77,12 @@
 
                 <div class="input-group">
                     <label>Repetir contraseña</label>
-                    <input type="password" placeholder="Repetir contraseña" formControlName="confirmar_password">
+                    <div class="password-field">
+                        <input [type]="mostrarConfirmarPassword ? 'text' : 'password'" placeholder="Repetir contraseña" formControlName="confirmar_password" autocomplete="new-password" (paste)="$event.preventDefault()" (drop)="$event.preventDefault()">
+                        <button type="button" class="password-toggle" [attr.aria-label]="mostrarConfirmarPassword ? 'Ocultar contraseña repetida' : 'Mostrar contraseña repetida'" [attr.aria-pressed]="mostrarConfirmarPassword" (click)="mostrarConfirmarPassword = !mostrarConfirmarPassword">
+                            {{ mostrarConfirmarPassword ? 'Ocultar' : 'Mostrar' }}
+                        </button>
+                    </div>
                     @if (registroForm.get('confirmar_password')?.touched &&
                     (registroForm.get('confirmar_password')?.errors?.['required'] ||
                     registroForm.errors?.['passwordsNoCoinciden'])) {

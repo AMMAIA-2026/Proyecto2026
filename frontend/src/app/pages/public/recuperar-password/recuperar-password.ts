@@ -21,6 +21,8 @@ export class RecuperarPassword {
   form: FormGroup;
   enviando = false;
   error = '';
+  mostrarPassword = false;
+  mostrarConfirmarPassword = false;
 
   constructor(
     private fb: FormBuilder,
