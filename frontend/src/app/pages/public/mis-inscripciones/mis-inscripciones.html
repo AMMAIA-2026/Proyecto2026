@@ -1,0 +1,82 @@
+<section class="inscripciones-page">
+  <header class="inscripciones-header">
+    <div>
+      <span class="eyebrow">Tu actividad</span>
+      <h1>Mis inscripciones</h1>
+      <p>Consultá las campañas en las que participás o participaste.</p>
+    </div>
+    <a class="explorar-btn" routerLink="/campanias">Explorar campañas</a>
+  </header>
+
+  @if (cargando()) {
+    <p class="estado">Cargando tus inscripciones...</p>
+  } @else if (error()) {
+    <p class="estado estado--error">{{ error() }}</p>
+  } @else if (inscripciones(); as datos) {
+    <section class="inscripciones-seccion">
+      <div class="seccion-titulo">
+        <div>
+          <h2>Actuales y próximas</h2>
+          <p>{{ datos.actuales.length }} inscripciones</p>
+        </div>
+      </div>
+
+      <div class="inscripciones-grid">
+        @for (inscripcion of datos.actuales; track inscripcion.id) {
+          <article class="inscripcion-card">
+            <div class="card-topline">
+              <span class="estado-badge">{{ inscripcion.campania.estado_calculado }}</span>
+              <span>{{ inscripcion.campania.fecha_inicio | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <h3>{{ inscripcion.campania.titulo }}</h3>
+            <p class="ubicacion">{{ inscripcion.campania.ubicacion }}</p>
+            <p class="fechas">
+              {{ inscripcion.campania.fecha_inicio | date:'dd/MM/yyyy' }}
+              al
+              {{ inscripcion.campania.fecha_fin | date:'dd/MM/yyyy' }}
+            </p>
+            @if (inscripcion.campania.centro_salud_detalle; as centro) {
+              <p class="centro">{{ centro.nombre }}</p>
+            }
+            <button
+              type="button"
+              class="cancelar-btn"
+              [disabled]="cancelando() === inscripcion.id"
+              (click)="cancelar(inscripcion)"
+            >
+              {{ cancelando() === inscripcion.id ? 'Cancelando...' : 'Cancelar inscripción' }}
+            </button>
+          </article>
+        } @empty {
+          <p class="estado estado--card">No tenés inscripciones actuales o próximas.</p>
+        }
+      </div>
+    </section>
+
+    <section class="inscripciones-seccion historicas">
+      <div class="seccion-titulo">
+        <div>
+          <h2>Histórico</h2>
+          <p>{{ datos.historicas.length }} inscripciones</p>
+        </div>
+      </div>
+
+      <div class="historicas-lista">
+        @for (inscripcion of datos.historicas; track inscripcion.id) {
+          <article class="historica-item">
+            <div>
+              <h3>{{ inscripcion.campania.titulo }}</h3>
+              <p>{{ inscripcion.campania.ubicacion }}</p>
+            </div>
+            <div class="historica-fecha">
+              <span>{{ inscripcion.campania.fecha_inicio | date:'dd/MM/yyyy' }}</span>
+              <strong>{{ inscripcion.campania.estado_calculado }}</strong>
+            </div>
+          </article>
+        } @empty {
+          <p class="estado estado--card">Todavía no tenés inscripciones históricas.</p>
+        }
+      </div>
+    </section>
+  }
+</section>
