@@ -115,7 +115,7 @@ h1 {
 
 .tabla-header {
   display: grid;
-  grid-template-columns: 2fr 2fr 1fr 220px;
+  grid-template-columns: 2fr 2fr 220px;
   padding: 20px;
   background: white;
   border-radius: 18px 18px 0 0;
@@ -125,7 +125,7 @@ h1 {
 
 .usuario-card {
   display: grid;
-  grid-template-columns: 2fr 2fr 1fr 220px;
+  grid-template-columns: 2fr 2fr 220px;
   align-items: center;
   background: white;
   padding: 25px 20px;
@@ -161,13 +161,6 @@ h1 {
   color: #555;
 }
 
-.grupo {
-  background: #efefef;
-  padding: 8px 15px;
-  border-radius: 30px;
-  font-weight: bold;
-}
-
 .acciones {
   display: flex;
   gap: 8px;
@@ -200,7 +193,6 @@ h1 {
 
   .perfil,
   .contacto,
-  .datos,
   .acciones {
     width: 100%;
   }
@@ -209,23 +201,6 @@ h1 {
     flex-wrap: wrap;
   }
 
-}
-
-.datos {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-}
-
-.grupo {
-  background: #f5d9dc;
-  color: #d64045;
-  padding: 6px 14px;
-  border-radius: 30px;
-  font-weight: bold;
-  font-size: 14px;
-  display: inline-block;
 }
 
 .btn-ver      { background: #EBF5FB; color: #185FA5; }

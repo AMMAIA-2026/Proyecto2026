@@ -7,8 +7,8 @@
 .contact-form { display: flex; flex-direction: column; gap: 18px; padding: 32px; background: white; border-radius: 22px; box-shadow: var(--shadow); }
 .field { display: flex; flex-direction: column; gap: 7px; }
 .field label { font-size: .85rem; font-weight: 700; }
-.field input, .field textarea { width: 100%; padding: 13px 14px; color: var(--text); font: inherit; font-size: .9rem; background: white; border: 1px solid var(--border); border-radius: 10px; outline: none; resize: vertical; }
-.field input:focus, .field textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,.1); }
+.field input, .field select, .field textarea { width: 100%; padding: 13px 14px; color: var(--text); font: inherit; font-size: .9rem; background: white; border: 1px solid var(--border); border-radius: 10px; outline: none; resize: vertical; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,.1); }
 .field small { color: var(--red); font-size: .75rem; }
 .counter { align-self: flex-end; color: var(--text-light); font-size: .7rem; }
 .contact-form button { align-self: flex-start; padding: 13px 28px; color: white; font-weight: 700; background: var(--red); border: 0; border-radius: 99px; cursor: pointer; }

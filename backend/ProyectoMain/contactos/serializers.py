@@ -8,8 +8,9 @@ class ContactoSerializer(serializers.ModelSerializer):
         model = Contacto
         fields = [
             'id',
-            'email',
-            'asunto',
+            'nombre_completo',
+            'correo_electronico',
+            'motivo',
             'mensaje',
             'tracked',
             'fecha_creacion',
