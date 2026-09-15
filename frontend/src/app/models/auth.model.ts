@@ -21,7 +21,6 @@ export interface RegistroPayload {
   nombre: string;
   apellido: string;
   fecha_nacimiento: string;
-  grupo_sanguineo: string;
 }
 
 export interface RecuperarPasswordPayload {

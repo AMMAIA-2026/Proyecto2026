@@ -97,19 +97,6 @@
                     }
                 </div>
 
-                <div class="input-group">
-                    <label>Grupo sanguíneo</label>
-                    <select formControlName="grupo_sanguineo">
-                        <option value="">Seleccioná tu grupo</option>
-                        @for (grupo of grupos; track grupo) {
-                        <option [value]="grupo">{{ grupo }}</option>
-                        }
-                    </select>
-                    @if (registroForm.get('grupo_sanguineo')?.invalid && registroForm.get('grupo_sanguineo')?.touched) {
-                    <small class="error">El grupo sanguíneo es obligatorio</small>
-                    }
-                </div>
-
                 <button type="submit" class="submit-btn" [disabled]="cargando">
                     {{ cargando ? 'Registrando...' : 'Crear cuenta' }}
                 </button>

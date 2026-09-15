@@ -6,17 +6,6 @@ class RolChoices(models.TextChoices):
     ADMINISTRADOR = 'Administrador', 'Administrador'
     USUARIO_ESTANDAR = 'Usuario Estandar', 'Usuario Estandar'
 
-class GrupoSanguineoChoices(models.TextChoices):
-    A_POSITIVO = 'A+', 'A+'
-    A_NEGATIVO = 'A-', 'A-'
-    B_POSITIVO = 'B+', 'B+'
-    B_NEGATIVO = 'B-', 'B-'
-    AB_POSITIVO = 'AB+', 'AB+'
-    AB_NEGATIVO = 'AB-', 'AB-'
-    O_POSITIVO = 'O+', 'O+'
-    O_NEGATIVO = 'O-', 'O-'
-
-
 LETRAS_NOMBRE_REGEX = r"^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñÜü]+)*$"
 
 
@@ -60,13 +49,6 @@ class Usuario(AbstractUser):
         null=False,
         blank=False
     )
-    grupo_sanguineo = models.CharField(
-        max_length=3,
-        choices=GrupoSanguineoChoices.choices,
-        null=False,
-        blank=False
-    )
-
     class Meta:
         db_table = 'usuarios'
 

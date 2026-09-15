@@ -8,5 +8,4 @@ export interface Usuario {
   fecha_nacimiento: string;
   fecha_registro: string;
   rol: string;
-  grupo_sanguineo: string;
 }
