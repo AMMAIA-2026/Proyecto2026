@@ -21,6 +21,8 @@ export class Registro {
   mensaje = '';
   error = '';
   cargando = false;
+  mostrarPassword = false;
+  mostrarConfirmarPassword = false;
 
   constructor(
     private fb: FormBuilder,

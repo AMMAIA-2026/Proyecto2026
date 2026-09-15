@@ -23,7 +23,12 @@
 
         <div class="input-group">
           <label>Contraseña</label>
-          <input type="password" placeholder="Contraseña" formControlName="password">
+          <div class="password-field">
+            <input [type]="mostrarPassword ? 'text' : 'password'" placeholder="Contraseña" formControlName="password" autocomplete="current-password" (paste)="$event.preventDefault()" (drop)="$event.preventDefault()">
+            <button type="button" class="password-toggle" [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'" [attr.aria-pressed]="mostrarPassword" (click)="mostrarPassword = !mostrarPassword">
+              {{ mostrarPassword ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
           @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
             <small class="error">
               @if (loginForm.get('password')?.errors?.['required']) {
