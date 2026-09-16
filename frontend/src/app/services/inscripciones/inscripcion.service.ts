@@ -1,10 +1,33 @@
 
 import { Injectable } from '@angular/core';
 
-import {HttpClient,HttpHeaders} from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
+import { Campania } from '../../models/campania.model';
+
+export interface Inscripcion {
+  id: number;
+  campania: Campania;
+}
+
+export interface MisInscripcionesResponse {
+  actuales: Inscripcion[];
+  historicas: Inscripcion[];
+}
+
+export interface InscripcionesCampaniaResponse {
+  campania: Campania;
+  total_inscriptos: number;
+  usuarios: {
+    id: number;
+    nombre: string;
+    apellido: string;
+    dni: string;
+    email: string;
+  }[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -16,29 +39,34 @@ export class InscripcionService {
 
   constructor(private http: HttpClient) {}
 
-  getCampania(id: string): Observable<any> {
-    return this.http.get(
-      `${this.apiUrl}/campanias/campanias/${id}/`
+  inscribirse(campaniaId: number): Observable<{ data: any, totalInscriptos: number }> {
+    return this.http.post<{ data: any, totalInscriptos: number }>(
+      `${this.apiUrl}/inscripciones/campanias/${campaniaId}/`,
+      null
     );
   }
 
-  getTotalInscriptos(campaniaId: number): Observable<{ totalInscriptos: number }> {
-  return this.http.get<{ totalInscriptos: number }>(
-    `${this.apiUrl}/inscripciones/inscripciones/total/?campania=${campaniaId}`
-  );
-}
+  obtenerMias(): Observable<MisInscripcionesResponse> {
+    return this.http.get<MisInscripcionesResponse>(
+      `${this.apiUrl}/inscripciones/mis-inscripciones/`
+    );
+  }
 
+  cancelar(inscripcionId: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.apiUrl}/inscripciones/${inscripcionId}/`
+    );
+  }
 
-  inscribirse(datos: any): Observable<{ data: any, totalInscriptos: number }> { 
-    const token = localStorage.getItem('access_token');
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
-
- return this.http.post<{ data: any, totalInscriptos: number }>( 
-      `${this.apiUrl}/inscripciones/inscripciones/`,
-      datos,
-      { headers }
+  obtenerPorCampania(
+    campaniaId: number,
+    buscar = '',
+  ): Observable<InscripcionesCampaniaResponse> {
+    const query = buscar.trim()
+      ? `?buscar=${encodeURIComponent(buscar.trim())}`
+      : '';
+    return this.http.get<InscripcionesCampaniaResponse>(
+      `${this.apiUrl}/inscripciones/campanias/${campaniaId}/${query}`
     );
   }
 }

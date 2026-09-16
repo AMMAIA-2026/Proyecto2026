@@ -2,10 +2,10 @@ import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UsuarioService } from '../../../../services/usuario/usuario.service';
 import Swal from 'sweetalert2';
+import { advertenciaEdad } from '../../../../validators/edad.validator';
 
 @Component({
   selector: 'app-usuario-modal',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './usuario-modal.html',
   styleUrl: './usuario-modal.css'
@@ -30,6 +30,7 @@ export class UsuarioModal implements OnChanges {
       apellido: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       dni: ['', Validators.required],
+      fecha_nacimiento: ['', Validators.required],
     });
   }
 
@@ -41,8 +42,13 @@ export class UsuarioModal implements OnChanges {
         apellido: this.usuario.apellido,
         email: this.usuario.email,
         dni: this.usuario.dni,
+        fecha_nacimiento: this.usuario.fecha_nacimiento,
       });
     }
+  }
+
+  advertenciaFechaNacimiento(): string {
+    return advertenciaEdad(this.editForm.get('fecha_nacimiento')?.value);
   }
 
   guardar(): void {
@@ -51,7 +57,10 @@ export class UsuarioModal implements OnChanges {
       return;
     }
     this.cargando = true;
-    this.usuarioService.editarUsuario(this.usuario.id, this.editForm.value).subscribe({
+    this.usuarioService.editarUsuario(this.usuario.id, {
+      ...this.editForm.value,
+      username: this.usuario.username,
+    }).subscribe({
       next: () => {
 
         this.cargando = false;

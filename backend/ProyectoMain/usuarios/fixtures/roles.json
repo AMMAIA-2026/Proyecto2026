@@ -1,5 +1,0 @@
-[
-  {"model": "usuarios.rol", "pk": 1, "fields": {"tipo_rol": "Administrador"}},
-  {"model": "usuarios.rol", "pk": 2, "fields": {"tipo_rol": "Usuario Estandar"}},
-  {"model": "usuarios.rol", "pk": 3, "fields": {"tipo_rol": "Usuario Invitado"}}
-]

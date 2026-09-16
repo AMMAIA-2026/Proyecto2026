@@ -1,13 +1,15 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { forkJoin } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CentroSalud } from '../../../../models/campania.model';
+import { CampaniaService } from '../../../../services/campanias/campania.service';
 
 
 @Component({
   selector: 'app-campania-form',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './campania-form.html',
   styleUrls: ['./campania-form.css']
@@ -15,9 +17,17 @@ import Swal from 'sweetalert2';
 export class CampaniaForm implements OnInit {
 
   campaniaForm: FormGroup;
-  estado_campania: any[] = [];
   modoEdicion = false;
   campaniaId: number | null = null;
+  estadoActual = '';
+  mensajeErrorFechaInicio = '';
+  mensajeErrorFechaFin = '';
+  fechaInicioOriginal: string | null = null;
+  readonly fechaMinima = this.formatearFechaParaInput(new Date());
+  minFechaInicio = this.fechaMinima;
+  centrosSalud: CentroSalud[] = [];
+  errorCentros = '';
+  totalInscriptosActual = 0;
 
   mensajesError: any = {
     titulo: {
@@ -35,20 +45,21 @@ export class CampaniaForm implements OnInit {
       minlength: 'La ubicación debe tener al menos 5 caracteres.',
       maxlength: 'La ubicación no puede superar los 100 caracteres.'
     },
+    centro_salud: {
+      required: 'El centro de salud es obligatorio.'
+    },
     fecha_inicio: { required: 'La fecha de inicio es obligatoria.' },
     fecha_fin: { required: 'La fecha de finalización es obligatoria.' },
-    estado_campania: { required: 'Debe seleccionar un estado.' }
+    cupo_maximo: { min: 'El cupo debe ser de al menos 1 donante.' }
   };
 
   private fb = inject(FormBuilder);
-  private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
+  private campaniaService = inject(CampaniaService);
 
   constructor() {
     this.campaniaForm = this.fb.group({
-
       titulo: ['',
         [Validators.required,
         Validators.minLength(5),
@@ -62,54 +73,146 @@ export class CampaniaForm implements OnInit {
         [Validators.required,
         Validators.minLength(5),
         Validators.maxLength(100)]],
+      centro_salud: [null, Validators.required],
       fecha_inicio: ['', Validators.required],
       fecha_fin: ['', Validators.required],
-      estado_campania: [null, Validators.required]
+      cupo_maximo: [null, Validators.min(1)],
+      estado_campania: [{ value: '', disabled: true }]
+    });
+
+    this.campaniaForm.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.actualizarEstado();
     });
   }
 
 
   ngOnInit(): void {
-    this.cargarEstados();
     this.campaniaId = Number(this.route.snapshot.paramMap.get('id'));
 
     if (this.campaniaId) {
       this.modoEdicion = true;
-      this.cargarCampania(this.campaniaId);
+      this.cargarDatosEdicion(this.campaniaId);
+    } else {
+      this.cargarCentrosSalud();
+      this.actualizarEstado();
     }
   }
 
-
-  cargarEstados() {
-    this.http.get<any[]>('http://localhost:8000/campanias/estados-campania/')
-      .subscribe({
-        next: (data) => {
-          this.estado_campania = data;
-          this.cdr.detectChanges();
-        },
-      });
-    }
-
-
-  cargarCampania(id: number) {
-    this.http.get<any>(`http://localhost:8000/campanias/campanias/${id}/`)
-      .subscribe(data => {
-        this.campaniaForm.patchValue(data);
-      });
+  cargarCentrosSalud(): void {
+    this.campaniaService.getCentrosSalud().subscribe({
+      next: centros => {
+        this.centrosSalud = centros;
+      },
+      error: () => {
+        this.errorCentros = 'No se pudieron cargar los centros de salud.';
+      }
+    });
   }
 
 
-  validarFechas(): boolean {
-    const inicio = new Date(
-      this.campaniaForm.value.fecha_inicio
+  cargarDatosEdicion(id: number): void {
+    forkJoin({
+      centros: this.campaniaService.getCentrosSalud(),
+      campania: this.campaniaService.getCampania(String(id))
+    }).subscribe({
+      next: ({ centros, campania }) => {
+        this.centrosSalud = centros;
+        const data = campania;
+        this.fechaInicioOriginal = data.fecha_inicio;
+        this.totalInscriptosActual = data.total_inscriptos;
+        this.minFechaInicio = data.fecha_inicio < this.fechaMinima
+          ? data.fecha_inicio
+          : this.fechaMinima;
+        this.campaniaForm.patchValue({
+          titulo: data.titulo,
+          descripcion: data.descripcion,
+          ubicacion: data.ubicacion,
+          centro_salud: data.centro_salud,
+          fecha_inicio: data.fecha_inicio,
+          fecha_fin: data.fecha_fin,
+          cupo_maximo: data.cupo_maximo
+        });
+        this.actualizarEstado();
+      },
+      error: () => {
+        this.errorCentros = 'No se pudieron recuperar los datos de la campaña.';
+      }
+    });
+  }
+
+
+  validarFechas(): string {
+    this.mensajeErrorFechaInicio = '';
+    this.mensajeErrorFechaFin = '';
+
+    const inicio = this.campaniaForm.value.fecha_inicio;
+    const fin = this.campaniaForm.value.fecha_fin;
+    const cupo = this.campaniaForm.value.cupo_maximo;
+
+    if (!inicio || !fin) {
+      return '';
+    }
+
+    if (
+      (!this.modoEdicion && inicio < this.fechaMinima) ||
+      (this.modoEdicion && inicio < this.fechaMinima && inicio !== this.fechaInicioOriginal)
+    ) {
+      this.mensajeErrorFechaInicio = 'La fecha de inicio no puede ser anterior a hoy.';
+      return this.mensajeErrorFechaInicio;
+    }
+
+    if (cupo && this.totalInscriptosActual >= cupo) {
+      this.estadoActual = 'Finalizada';
+    } else if (fin < this.fechaMinima) {
+      this.mensajeErrorFechaFin = 'No se puede crear o editar una campaña finalizada.';
+      return this.mensajeErrorFechaFin;
+    }
+
+    if (fin < inicio) {
+      this.mensajeErrorFechaFin = 'La fecha de fin no puede ser anterior a la fecha de inicio.';
+      return this.mensajeErrorFechaFin;
+    }
+
+    return '';
+  }
+
+
+  private actualizarEstado(): void {
+    const inicio = this.campaniaForm.value.fecha_inicio;
+    const fin = this.campaniaForm.value.fecha_fin;
+
+    this.validarFechas();
+
+    if (!inicio || !fin) {
+      this.estadoActual = '';
+      this.campaniaForm.get('estado_campania')?.setValue('', { emitEvent: false });
+      return;
+    }
+
+    const cupo = this.campaniaForm.value.cupo_maximo;
+
+    if (cupo && this.totalInscriptosActual >= cupo) {
+      this.estadoActual = 'Finalizada';
+    } else if (fin < this.fechaMinima) {
+      this.estadoActual = 'Finalizada';
+    } else if (inicio > this.fechaMinima) {
+      this.estadoActual = 'Proximamente';
+    } else {
+      this.estadoActual = 'Activa';
+    }
+
+    this.campaniaForm.get('estado_campania')?.setValue(
+      this.estadoActual,
+      { emitEvent: false }
     );
+  }
 
-    const fin = new Date(
-      this.campaniaForm.value.fecha_fin
-    );
 
-    return fin >= inicio;
-
+  private formatearFechaParaInput(fecha: Date): string {
+    const anio = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    return `${anio}-${mes}-${dia}`;
   }
 
 
@@ -125,29 +228,34 @@ export class CampaniaForm implements OnInit {
     return this.mensajesError[campo]?.[primerError] || '';
   }
 
+  cancelar(): void {
+    this.router.navigate(['/admin/campanias']);
+  }
+
+
   onSubmit() {
     this.campaniaForm.markAllAsTouched();
     if (this.campaniaForm.invalid) {
       return;
     }
 
-    if (!this.validarFechas()) {
+    const errorFechas = this.validarFechas();
+    if (errorFechas) {
       Swal.fire({
         title: 'Fechas inválidas',
-        text: 'La fecha de finalización no puede ser anterior a la fecha de inicio',
+        text: errorFechas,
         icon: 'error'
       });
       return;
     }
 
-    const data = this.campaniaForm.value;
+    const data = {
+      ...this.campaniaForm.value,
+      estado_campania: this.estadoActual
+    };
 
     if (this.modoEdicion) {
-
-      this.http.put(
-        `http://localhost:8000/campanias/campanias/${this.campaniaId}/`,
-        data
-      ).subscribe(() => {
+      this.campaniaService.editarCampania(this.campaniaId!, data).subscribe(() => {
         Swal.fire({
           title: 'Campaña actualizada',
           text: 'La campaña ha sido actualizada correctamente',
@@ -164,11 +272,7 @@ export class CampaniaForm implements OnInit {
       });
 
     } else {
-
-      this.http.post(
-        'http://localhost:8000/campanias/campanias/',
-        data
-      ).subscribe(() => {
+      this.campaniaService.crearCampania(data).subscribe(() => {
         Swal.fire({
           title: 'Campaña creada',
           text: 'La campaña ha sido creada correctamente',

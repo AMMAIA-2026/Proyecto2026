@@ -1,14 +1,95 @@
-<div class="placeholder-page">
-
-    <div class="placeholder-card">
-
-        <svg class="placeholder-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 11l3 3L22 4"></path>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-        </svg>
-        <h2>Pendiente de desarrollo</h2>
-        <p>La sección de inscripciones estará disponible próximamente.</p>
-
+<section class="inscripciones-admin-page">
+  <header class="inscripciones-admin-header">
+    <div>
+      <span class="eyebrow">Gestión administrativa</span>
+      <h1>Inscripciones</h1>
+      <p>Consultá quiénes están inscriptos en cada campaña.</p>
     </div>
+  </header>
 
-</div>
+  @if (error()) {
+    <p class="estado estado--error">{{ error() }}</p>
+  }
+
+  <div class="inscripciones-admin-layout">
+    <section class="campanias-panel">
+      <h2>Campañas</h2>
+      @if (cargandoCampanias()) {
+        <p class="estado">Cargando campañas...</p>
+      } @else {
+        <div class="campanias-lista">
+          @for (campania of campanias(); track campania.id) {
+            <button
+              type="button"
+              class="campania-item"
+              [class.campania-item--active]="seleccion()?.campania?.id === campania.id"
+              (click)="seleccionar(campania.id)"
+            >
+              <span>
+                <strong>{{ campania.titulo }}</strong>
+                <small>{{ campania.fecha_inicio | date:'dd/MM/yyyy' }}</small>
+              </span>
+              <b>{{ campania.total_inscriptos }}</b>
+            </button>
+          } @empty {
+            <p class="estado">No hay campañas registradas.</p>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="inscriptos-panel">
+      @if (cargandoDetalle()) {
+        <p class="estado">Cargando inscriptos...</p>
+      } @else if (seleccion(); as detalle) {
+        <header class="detalle-header">
+          <div>
+            <span class="eyebrow">Detalle de campaña</span>
+            <h2>{{ detalle.campania.titulo }}</h2>
+            <p>
+              {{ detalle.campania.fecha_inicio | date:'dd/MM/yyyy' }} al
+              {{ detalle.campania.fecha_fin | date:'dd/MM/yyyy' }} ·
+              {{ detalle.campania.estado_calculado }}
+            </p>
+          </div>
+          <strong class="total-badge">{{ detalle.total_inscriptos }} inscriptos</strong>
+        </header>
+
+        <label class="busqueda-label" for="buscar-inscripto">Buscar usuario</label>
+        <input
+          id="buscar-inscripto"
+          class="busqueda-input"
+          type="search"
+          placeholder="Nombre, apellido, DNI o email"
+          [value]="busqueda()"
+          (input)="actualizarBusqueda($event)"
+        >
+
+        <div class="usuarios-tabla-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>DNI</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (usuario of usuariosVisibles(); track usuario.id) {
+                <tr>
+                  <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
+                  <td>{{ usuario.dni }}</td>
+                  <td><a [href]="'mailto:' + usuario.email">{{ usuario.email }}</a></td>
+                </tr>
+              } @empty {
+                <tr><td colspan="3" class="estado">No hay usuarios para esta búsqueda.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <p class="estado estado--empty">Seleccioná una campaña para ver sus inscriptos.</p>
+      }
+    </section>
+  </div>
+</section>

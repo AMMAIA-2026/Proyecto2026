@@ -1,54 +1,49 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { AuthService } from '../../../services/auth/auth';
+import {
+  passwordsCoinciden,
+  validadoresPassword
+} from '../../../validators/password.validators';
+import { advertenciaEdad } from '../../../validators/edad.validator';
 
 @Component({
   selector: 'app-registro',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './registro.html',
   styleUrl: './registro.css'
 })
-export class Registro implements OnInit {
+export class Registro {
 
   registroForm: FormGroup;
-  roles: any[] = [];
-  grupos: any[] = [];
   mensaje = '';
   error = '';
   cargando = false;
+  mostrarPassword = false;
+  mostrarConfirmarPassword = false;
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
   ) {
     this.registroForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+       password: ['', validadoresPassword()],
+       confirmar_password: ['', Validators.required],
       nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
-      dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
-      rol: [2],
-      grupo_sanguineo: ['', Validators.required]
-    });
+       apellido: ['', Validators.required],
+       fecha_nacimiento: ['', Validators.required],
+       dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
+       rol: ['Usuario Estandar']
+     }, { validators: passwordsCoinciden });
   }
 
-  ngOnInit(): void {
-    this.http.get<any[]>('http://localhost:8000/usuarios/rol/').subscribe({
-      next: (data) => this.roles = data,
-      error: () => this.error = 'No se pudieron cargar los roles'
-    });
-
-
-
-    this.http.get<any[]>('http://localhost:8000/usuarios/grupos-sanguineos/').subscribe({
-      next: (data) => this.grupos = data,
-      error: () => this.error = 'No se pudieron cargar los grupos sanguíneos'
-    });
+  advertenciaFechaNacimiento(): string {
+    return advertenciaEdad(this.registroForm.get('fecha_nacimiento')?.value);
   }
 
   onSubmit() {
@@ -63,7 +58,9 @@ export class Registro implements OnInit {
     if (this.cargando) return;
     this.cargando = true;
 
-    this.http.post('http://localhost:8000/usuarios/registro/', this.registroForm.value).subscribe({
+    const { confirmar_password, ...datosRegistro } = this.registroForm.getRawValue();
+
+    this.authService.registrar(datosRegistro).subscribe({
       next: () => {
         this.cargando = false;
         Swal.fire({

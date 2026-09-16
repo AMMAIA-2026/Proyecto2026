@@ -1,5 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Campania } from '../../../models/campania.model';
 import { CampaniaService } from '../../../services/campanias/campania.service';
 import { InscripcionService } from '../../../services/inscripciones/inscripcion.service';
 import { AuthService } from '../../../services/auth/auth';
@@ -7,23 +9,21 @@ import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-campania-detalle',
-  standalone: true,
   imports: [],
   templateUrl: './campania-detalle.html',
   styleUrl: './campania-detalle.css'
 })
 export class CampaniaDetalle implements OnInit {
 
-  campania: any = null;
-  cargando: boolean = true;
-  error: string = '';
-  inscriptosCount = 0;
+  campania = signal<Campania | null>(null);
+  cargando = signal(true);
+  error = signal('');
+  inscriptosCount = signal(0);
 
   constructor(
     private campaniaService: CampaniaService,
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef,
     private inscripcionService: InscripcionService,
     private authService: AuthService
   ) { }
@@ -34,37 +34,27 @@ export class CampaniaDetalle implements OnInit {
     const obs = this.campaniaService.getCampania(id!);
 
     obs.subscribe({
-      next: (data: any) => {
-        this.campania = data;
-        this.cargando = false;
-
-        this.inscripcionService.getTotalInscriptos(this.campania.id).subscribe({
-          next: (respuesta) => {
-            this.inscriptosCount = respuesta.totalInscriptos;
-            this.cdr.detectChanges();
-          }
-        });
-        this.cdr.detectChanges();
+      next: (data: Campania) => {
+        this.campania.set(data);
+        this.cargando.set(false);
+        this.inscriptosCount.set(data.total_inscriptos);
 
       },
 
       error: (err: any) => {
-        this.error = 'No se pudo cargar la campaña.';
-        this.cargando = false;
-        this.cdr.detectChanges();
+        this.error.set('No se pudo cargar la campaña.');
+        this.cargando.set(false);
       }
     });
 
   }
 
   getEstado(): string {
-    if (!this.campania) return '';
-    const hoy = new Date();
-    const inicio = new Date(this.campania.fecha_inicio);
-    const fin = new Date(this.campania.fecha_fin);
-    if (hoy < inicio) return 'Proxima';
-    if (hoy > fin) return 'Finalizada';
-    return 'En Curso';
+    const campania = this.campania();
+    if (!campania) return '';
+    if (campania.estado_calculado === 'Proximamente') return 'Proxima';
+    if (campania.estado_calculado === 'Activa') return 'En Curso';
+    return 'Finalizada';
   }
 
   formatearFecha(fecha: string): string {
@@ -74,6 +64,10 @@ export class CampaniaDetalle implements OnInit {
   }
 
   inscribirse() {
+    const campania = this.campania();
+    if (!campania) {
+      return;
+    }
 
     if (!this.authService.isAuthenticated()) {
       Swal.fire({
@@ -87,12 +81,10 @@ export class CampaniaDetalle implements OnInit {
       return;
     };
 
-    this.inscripcionService.inscribirse({
-      campania: this.campania.id
-    }).subscribe({
+    this.inscripcionService.inscribirse(campania.id).subscribe({
 
       next: (respuesta) => {
-        this.inscriptosCount = respuesta.totalInscriptos;
+        this.inscriptosCount.set(respuesta.totalInscriptos);
         Swal.fire({
           icon: 'success',
           title: 'Inscripción exitosa',
@@ -102,12 +94,23 @@ export class CampaniaDetalle implements OnInit {
         });
       },
 
-      error: (err) => {
-        console.log(err);
+      error: (err: HttpErrorResponse) => {
+        const codigo = err.error?.codigo;
+        const errorEsperado = [
+          'inscripcion_duplicada',
+          'edad_no_permitida',
+          'cupo_completo',
+          'campania_finalizada'
+        ].includes(codigo);
+
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Hubo un problema al inscribirse a la campaña',
+          icon: errorEsperado ? 'info' : 'error',
+          title: codigo === 'inscripcion_duplicada'
+            ? 'Inscripción existente'
+            : 'No es posible inscribirse',
+          text: errorEsperado
+            ? err.error.mensaje
+            : 'Hubo un problema al inscribirse a la campaña',
           showConfirmButton: false,
           timer: 2000
         });

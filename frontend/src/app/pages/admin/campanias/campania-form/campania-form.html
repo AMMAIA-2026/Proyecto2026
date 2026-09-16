@@ -28,39 +28,61 @@
                 </div>
 
                 <div class="input-group">
-                    <label>Fecha inicio</label>
-                    <input type="date" formControlName="fecha_inicio" />
-                    @if (obtenerError('fecha_inicio')) {
-                    <p class="error"> {{ obtenerError('fecha_inicio') }}</p>}
+                    <label>Centro de salud asociado</label>
+                    <select formControlName="centro_salud">
+                        <option [ngValue]="null" disabled>Seleccioná un centro</option>
+                        @for (centro of centrosSalud; track centro.id) {
+                        <option [ngValue]="centro.id">
+                            {{ centro.nombre }} - {{ centro.localidad }}
+                        </option>
+                        }
+                    </select>
+                    @if (obtenerError('centro_salud')) {
+                    <p class="error">{{ obtenerError('centro_salud') }}</p>}
+                    @if (errorCentros) {
+                    <p class="error">{{ errorCentros }}</p>}
                 </div>
+
+                <div class="input-group">
+                    <label>Fecha inicio</label>
+                     <input type="date" formControlName="fecha_inicio" [min]="minFechaInicio" />
+                     @if (obtenerError('fecha_inicio')) {
+                     <p class="error"> {{ obtenerError('fecha_inicio') }}</p>}
+                     @if (mensajeErrorFechaInicio) {
+                     <p class="error">{{ mensajeErrorFechaInicio }}</p>
+                     }
+                 </div>
 
                 <div class="input-group">
                     <label>Fecha fin</label>
-                    <input type="date" formControlName="fecha_fin" />
-                    @if (obtenerError('fecha_fin')) {
-                    <p class="error"> {{ obtenerError('fecha_fin') }}</p>}
-                </div>
+                     <input type="date" formControlName="fecha_fin" [min]="fechaMinima" />
+                      @if (obtenerError('fecha_fin')) {
+                      <p class="error"> {{ obtenerError('fecha_fin') }}</p>}
+                      @if (mensajeErrorFechaFin) {
+                      <p class="error">{{ mensajeErrorFechaFin }}</p>
+                      }
+                 </div>
 
                 <div class="input-group">
-                    <label>Estado</label>
-                    <select formControlName="estado_campania">
-
-                        <option [ngValue]="null">Seleccionar</option>
-
-                        @for (estado of estado_campania; track estado.id) {
-                        <option [ngValue]="estado.id">{{ estado.estado }}</option>
-                        }
-
-                    </select>
-
-                    @if (obtenerError('estado_campania')) {
-                    <p class="error">{{ obtenerError('estado_campania') }}</p>
-                    }
+                    <label>Cupo de donantes (opcional)</label>
+                    <input type="number" min="1" formControlName="cupo_maximo" placeholder="Sin límite" />
+                    @if (obtenerError('cupo_maximo')) {
+                    <p class="error">{{ obtenerError('cupo_maximo') }}</p>}
                 </div>
 
-                <button type="submit" class="submit-btn">
-                    {{ modoEdicion ? 'Actualizar' : 'Crear' }}
-                </button>
+                 <div class="input-group">
+                     <label>Estado (automático)</label>
+                     <input formControlName="estado_campania" readonly />
+                 </div>
+
+                 <div class="form-actions">
+                     <button type="button" class="cancel-btn" (click)="cancelar()">
+                         Cancelar
+                     </button>
+                     <button type="submit" class="submit-btn">
+                         {{ modoEdicion ? 'Actualizar' : 'Crear' }}
+                     </button>
+                 </div>
             </form>
         </div>
     </div>

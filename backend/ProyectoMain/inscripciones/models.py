@@ -13,7 +13,14 @@ class Inscripcion(models.Model):
         on_delete=models.CASCADE
     )
         fecha_inscripcion = models.DateTimeField(auto_now_add=True)
-        
+
+        class Meta:
+            db_table = 'inscripciones'
+            constraints = [
+                models.UniqueConstraint(
+                    fields=['usuario', 'campania'],
+                    name='inscripcion_unica_usuario_campania',
+                )
+            ]
         def __str__(self):
             return f"{self.usuario} - {self.campania}"
-        

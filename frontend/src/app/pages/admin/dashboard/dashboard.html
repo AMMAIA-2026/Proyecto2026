@@ -1,3 +1,5 @@
+@if (dashboardData$ | async; as dashboard) {
+
 <div class="dashboard-page">
 
     <section class="dashboard-header">
@@ -17,19 +19,19 @@
 
         <article class="kpi-card">
             <span class="kpi-label">Total campañas</span>
-            <h2>{{ (dashboardData$ | async)?.total_campanias }}</h2>
+            <h2>{{ dashboard.total_campanias }}</h2>
             <p class="positive">Campañas registradas</p>
         </article>
 
         <article class="kpi-card">
             <span class="kpi-label">Inscripciones</span>
-            <h2>{{ (dashboardData$ | async)?.total_inscripciones }}</h2>
+            <h2>{{ dashboard.total_inscripciones }}</h2>
             <p class="positive">Inscripciones registradas</p>
         </article>
 
         <article class="kpi-card">
             <span class="kpi-label">Donantes activos</span>
-            <h2>{{ (dashboardData$ | async)?.total_donantes }}</h2>
+            <h2>{{ dashboard.total_donantes }}</h2>
             <p class="positive">Donantes registrados</p>
         </article>
 
@@ -47,7 +49,7 @@
 
             <div class="card-header">
 
-                <h3>Tipos de campañas</h3>
+                <h3>Estado de campañas</h3>
 
                 <button class="view-btn" (click)="abrirModal('campanas')">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -62,29 +64,29 @@
             <div class="campaign-chart-layout">
 
 
-                <div class="chart-placeholder pie-chart" [style.background]="(dashboardData$ | async)?.conicGradient">
+                <div class="chart-placeholder pie-chart" [style.background]="dashboard.conicGradient">
 
                     <div class="pie-center">
                         100%
                     </div>
 
                     <div class="chart-tooltip">
-                        <strong>{{ ((dashboardData$ | async)?.campanias_por_tipo)?.[0]?.titulo }}</strong>
-                        <span>{{ ((dashboardData$ | async)?.campanias_por_tipo)?.[0]?.porcentaje }}% del total</span>
+                        <strong>{{ dashboard.campanias_por_tipo[0]?.estado || 'Sin campañas' }}</strong>
+                        <span>{{ dashboard.campanias_por_tipo[0]?.porcentaje || 0 }}% del total</span>
                     </div>
 
                 </div>
 
                 <div class="chart-legend">
 
-                    @for (item of (dashboardData$ | async)?.campanias_por_tipo; track item.titulo) {
+                    @for (item of dashboard.campanias_por_tipo; track item.estado) {
 
                     <div class="legend-item">
 
                         <span class="legend-color" [style.background]="item.color"></span>
 
                         <div>
-                            <strong>{{ item.titulo }}</strong>
+                            <strong>{{ item.estado }}</strong>
                             <p>{{ item.porcentaje }}%</p>
                         </div>
 
@@ -102,7 +104,7 @@
 
             <div class="card-header">
 
-                <h3>Inscripciones mensuales</h3>
+                <h3>Donantes mensuales</h3>
 
                 <button class="view-btn" (click)="abrirModal('inscripciones')">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -116,16 +118,16 @@
 
             <div class="bar-chart">
 
-                @for (mes of (dashboardData$ | async)?.meses; track mes.mes) {
+                @for (mes of dashboard.meses; track mes.clave) {
 
                 <div class="bar-item">
 
                     <div class="bar-tooltip">
                         <strong>{{ mes.mes }}</strong>
-                        <span>{{ mes.inscripciones }} inscripciones</span>
+                        <span>{{ mes.donantes }} donantes</span>
                     </div>
 
-                    <div class="bar" [style.height.%]="mes.inscripciones"></div>
+                    <div class="bar" [style.height.%]="mes.altura"></div>
 
                     <span class="bar-label">
                         {{ mes.mes }}
@@ -158,7 +160,7 @@
 
         <div class="card-header">
             <h3>Campañas recientes</h3>
-            <button class="secondary-btn">
+            <button class="secondary-btn" (click)="verTodasCampanias()">
                 Ver todas
             </button>
         </div>
@@ -171,7 +173,9 @@
 
                     <tr>
                         <th>Campaña</th>
-                        <th>Localidad</th>
+                        <th>Ubicación</th>
+                        <th>Centro médico</th>
+                        <th>Cupo</th>
                         <th>Estado</th>
                     </tr>
 
@@ -180,7 +184,7 @@
                 <tbody>
 
                     @for (
-                    campania of (dashboardData$ | async)?.campanias_recientes;
+                    campania of dashboard.campanias_recientes;
                     track campania.id
                     ) {
 
@@ -195,15 +199,19 @@
                         </td>
 
                         <td>
+                            {{ campania.centro_salud_detalle?.nombre || 'Sin asociar' }}
+                        </td>
 
-                            <span class="badge" [class.active]="campania.estado_campania === 1"
-                                [class.ended]="campania.estado_campania !== 1">
+                        <td>
+                            {{ campania.total_inscriptos }} / {{ campania.cupo_maximo ?? 'Sin límite' }}
+                        </td>
 
-                                {{
-                                campania.estado_campania === 1
-                                ? 'Activa'
-                                : 'Finalizada'
-                                }}
+                        <td>
+
+                            <span class="badge" [class.active]="campania.estado === 'Activa'"
+                                [class.ended]="campania.estado === 'Finalizada'">
+
+                                {{ campania.estado }}
 
                             </span>
 
@@ -214,7 +222,7 @@
                     } @empty {
 
                     <tr>
-                        <td colspan="3">
+                        <td colspan="5">
                             No hay campañas recientes
                         </td>
                     </tr>
@@ -245,33 +253,33 @@
 
         <div class="modal-chart">
 
-            <h2>Tipos de campañas</h2>
+                    <h2>Estado de campañas</h2>
 
             <div class="campaign-chart-layout">
 
-                <div class="chart-placeholder pie-chart" [style.background]="(dashboardData$ | async)?.conicGradient">
+                <div class="chart-placeholder pie-chart" [style.background]="dashboard.conicGradient">
 
                     <div class="pie-center">
                         100%
                     </div>
 
                     <div class="chart-tooltip">
-                        <strong>{{ ((dashboardData$ | async)?.campanias_por_tipo)?.[0]?.titulo }}</strong>
-                        <span>{{ ((dashboardData$ | async)?.campanias_por_tipo)?.[0]?.porcentaje }}% del total</span>
+                        <strong>{{ dashboard.campanias_por_tipo[0]?.estado || 'Sin campañas' }}</strong>
+                        <span>{{ dashboard.campanias_por_tipo[0]?.porcentaje || 0 }}% del total</span>
                     </div>
 
                 </div>
 
                 <div class="chart-legend">
 
-                    @for (item of (dashboardData$ | async)?.campanias_por_tipo; track item.titulo) {
+                    @for (item of dashboard.campanias_por_tipo; track item.estado) {
 
                     <div class="legend-item">
 
                         <span class="legend-color" [style.background]="item.color"></span>
 
                         <div>
-                            <strong>{{ item.titulo }}</strong>
+                            <strong>{{ item.estado }}</strong>
                             <p>{{ item.porcentaje }}%</p>
                         </div>
 
@@ -291,20 +299,20 @@
 
         <div class="modal-chart">
 
-            <h2>Inscripciones mensuales</h2>
+                <h2>Donantes mensuales</h2>
 
             <div class="bar-chart">
 
-                @for (mes of (dashboardData$ | async)?.meses; track mes.mes) {
+                @for (mes of dashboard.meses; track mes.clave) {
 
                 <div class="bar-item">
 
                     <div class="bar-tooltip">
                         <strong>{{ mes.mes }}</strong>
-                        <span>{{ mes.inscripciones }} inscripciones</span>
+                        <span>{{ mes.donantes }} donantes</span>
                     </div>
 
-                    <div class="bar" [style.height.%]="mes.inscripciones"></div>
+                    <div class="bar" [style.height.%]="mes.altura"></div>
 
                     <span class="bar-label">
                         {{ mes.mes }}
@@ -334,4 +342,8 @@
 
 </div>
 
+}
+
+} @else {
+<div class="dashboard-loading">Cargando información del dashboard...</div>
 }

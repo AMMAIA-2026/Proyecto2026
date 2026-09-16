@@ -180,6 +180,7 @@ td {
 }
 
 .editar-btn,
+.inscripciones-btn,
 .eliminar-btn {
     border: none;
     padding: 8px 10px;
@@ -187,8 +188,14 @@ td {
     cursor: pointer;
 }
 
+.acciones {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 8px;
+}
+
 .editar-btn {
-    margin-right: 8px;
     background: #fada83;
     color: #473903
 }
@@ -219,4 +226,9 @@ td {
 .estado-finalizada {
     background: #f8d7da;
     color: #721c24;
+}
+
+.inscripciones-btn {
+    background: #e4f5e9;
+    color: #27633a;
 }

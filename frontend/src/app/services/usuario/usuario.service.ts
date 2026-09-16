@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Usuario } from '../../models/usuario.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsuarioService {
 
-  private apiUrl = 'http://127.0.0.1:8000/usuarios/usuarios/';
+  private apiUrl = 'http://127.0.0.1:8000/usuarios/';
 
   constructor(private http: HttpClient) {}
 
@@ -15,12 +17,12 @@ export class UsuarioService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  getUsuarios() {
-    return this.http.get<any[]>(this.apiUrl, { headers: this.headers() });
+  getUsuarios(): Observable<Usuario[]> {
+    return this.http.get<Usuario[]>(this.apiUrl, { headers: this.headers() });
   }
 
   editarUsuario(id: number, datos: any) {
-    return this.http.patch(`${this.apiUrl}${id}/`, datos, { headers: this.headers() });
+    return this.http.put(`${this.apiUrl}${id}/`, datos, { headers: this.headers() });
   }
 
   eliminarUsuario(id: number) {

@@ -1,48 +1,35 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { signal } from '@angular/core';
 import Swal from 'sweetalert2';
 import { DatePipe } from '@angular/common';
+import { Campania } from '../../../models/campania.model';
+import { CampaniaService } from '../../../services/campanias/campania.service';
 
 
 @Component({
   selector: 'app-campanias-admin',
-  standalone: true,
   imports: [DatePipe],
   templateUrl: './campanias.html',
   styleUrls: ['./campanias.css']
 })
 export class AdminCampanias implements OnInit {
 
-  campanias = signal<any[]>([]);
-  estados: any[] = [];
-  
+  campanias = signal<Campania[]>([]);
 
   error = '';
 
   constructor(
-  private http: HttpClient,
+  private campaniaService: CampaniaService,
   private router: Router
 ) {}
 
   ngOnInit(): void {
-
-    this.http.get<any[]>(
-      'http://localhost:8000/campanias/estados-campania/'
-    ).subscribe({
-      next: (data) => this.estados = data,
-      error: () => this.error = 'No se pudieron cargar los estados'
-    });
-
     this.cargarCampanias();
-
   }
 
   cargarCampanias() {
-    this.http.get<any[]>(
-      'http://localhost:8000/campanias/campanias/'
-    ).subscribe({
+    this.campaniaService.getCampanias().subscribe({
 
       next: (data) => {
         this.campanias.set(data);
@@ -63,6 +50,12 @@ export class AdminCampanias implements OnInit {
     this.router.navigate(['/admin/campanias/editar', id]);
   }
 
+  verInscripciones(id: number): void {
+    this.router.navigate(['/admin/inscripciones'], {
+      queryParams: { campania: id },
+    });
+  }
+
   
   eliminarCampania(id: number) {
 
@@ -79,9 +72,7 @@ export class AdminCampanias implements OnInit {
 
     if (!result.isConfirmed) return;
 
-    this.http.delete(
-      `http://localhost:8000/campanias/campanias/${id}/`
-    ).subscribe({
+    this.campaniaService.eliminarCampania(id).subscribe({
 
       next: () => {
 

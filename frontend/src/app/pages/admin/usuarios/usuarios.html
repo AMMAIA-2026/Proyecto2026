@@ -6,7 +6,7 @@
   <div class="card-estadistica">
 
     <div>
-      <h2>{{ usuarios.length }}</h2>
+      <h2>{{ usuarios().length }}</h2>
       <p>Usuarios Registrados</p>
     </div>
 
@@ -40,13 +40,12 @@
 
     <span>Perfil</span>
     <span>Contacto</span>
-    <span>Datos</span>
     <span>Acciones</span>
 
   </div>
 
 
-  @for (usuario of usuarios; track usuario.id) {
+  @for (usuario of usuarios(); track usuario.id) {
 
   <div class="usuario-card">
 
@@ -83,15 +82,6 @@
       </p>
 
     </div>
-
-
-    <div class="datos">
-      <small>Grupo Sanguíneo</small>
-      <span class="grupo">
-        {{ usuario.grupo_sanguineo_texto }}
-      </span>
-    </div>
-
 
 
     <div class="acciones">

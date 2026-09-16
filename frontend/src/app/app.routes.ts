@@ -9,12 +9,15 @@ import { AdminInscripciones } from './pages/admin/inscripciones/inscripciones';
 import { Login } from './pages/public/login/login';
 import { Campanias } from './pages/public/campanias/campanias';
 import { Usuarios } from './pages/admin/usuarios/usuarios';
-import { Inscripciones } from './pages/public/inscripciones/inscripciones';
 import { CampaniaDetalle } from './pages/public/campania-detalle/campania-detalle';
 import { Registro } from './pages/public/registro/registro';
 import { Informate } from './pages/public/informate/informate';
 import { authGuard } from './guards/auth-guard';
 import { CampaniaForm } from './pages/admin/campanias/campania-form/campania-form';
+import { RecuperarPassword } from './pages/public/recuperar-password/recuperar-password';
+import { ContactosAdmin } from './pages/admin/contactos/contactos';
+import { Contactanos } from './pages/public/contactanos/contactanos';
+import { MisInscripciones } from './pages/public/mis-inscripciones/mis-inscripciones';
 
 
 
@@ -28,11 +31,13 @@ export const routes: Routes = [
             { path: '', component: Landing },
             { path: 'quienes-somos', component: QuienesSomos },
             { path: 'login', component: Login },
+            { path: 'recuperar-password', component: RecuperarPassword },
             { path: 'campanias', component: Campanias },
-            { path: 'campanias/:id/inscripcion', component: Inscripciones },
             { path: 'campanias/:id', component: CampaniaDetalle },
             { path: 'registro', component: Registro },
             { path: 'informate', component: Informate },
+            { path: 'contactanos', component: Contactanos },
+            { path: 'mis-inscripciones', component: MisInscripciones },
 
         ]
     },
@@ -50,7 +55,7 @@ export const routes: Routes = [
             { path: 'usuarios', component: Usuarios},
             { path: 'campanias/nueva', component: CampaniaForm },
             { path: 'campanias/editar/:id', component: CampaniaForm },
-            { path: 'usuarios', component: Usuarios },
+            { path: 'contactos', component: ContactosAdmin },
         ]
     },
 

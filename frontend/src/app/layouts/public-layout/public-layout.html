@@ -58,6 +58,16 @@
                         Quiénes somos
                     </a>
 
+                    <a class="nav-link" routerLink="/contactanos">
+                        Contactanos
+                    </a>
+
+                    @if (isStandardUser()) {
+                        <a class="nav-link" routerLink="/mis-inscripciones">
+                            Mis inscripciones
+                        </a>
+                    }
+
                     @if (!isLoggedIn()) {
                         <a class="nav-link nav-cta" routerLink="/registro">
                         Unite

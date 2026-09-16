@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { Location } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-public-layout',
-  standalone: true,
   imports: [RouterModule],
   templateUrl: './public-layout.html',
   styleUrls: ['./public-layout.css']
@@ -18,6 +18,8 @@ export class PublicLayout {
     this.isHome = this.router.url === '/';
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
+    ).pipe(
+      takeUntilDestroyed()
     ).subscribe((e: NavigationEnd) => {
       this.isHome = e.urlAfterRedirects === '/';
     });
@@ -25,6 +27,10 @@ export class PublicLayout {
 
   isLoggedIn(): boolean {
     return !!localStorage.getItem('access_token');
+  }
+
+  isStandardUser(): boolean {
+    return this.isLoggedIn() && localStorage.getItem('rol') === 'Usuario Estandar';
   }
 
   logout() {

@@ -58,7 +58,7 @@ h1 {
 }
 
 .submit-btn {
-    width: 100%;
+    flex: 1;
     padding: 14px;
     background: #C0392B;
     color: white;
@@ -66,12 +66,35 @@ h1 {
     border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 12px;
+    margin-top: 0;
     transition: 0.2s;
 }
 
 .submit-btn:hover {
     background: #922B21;
+}
+
+.form-actions {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.cancel-btn {
+    flex: 1;
+    padding: 14px;
+    background: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.cancel-btn:hover {
+    background: #cfcfcf;
 }
 
 

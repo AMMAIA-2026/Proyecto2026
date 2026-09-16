@@ -64,7 +64,8 @@
   margin: 4px 0 0;
 }
 
-.campo input {
+.campo input,
+.campo select {
   width: 100%;
   padding: 10px 12px;
   border: 1.5px solid #e0e0e0;
@@ -75,9 +76,12 @@
   box-sizing: border-box;
 }
 
-.campo input:focus { border-color: #C0392B; }
+.campo input:focus,
+.campo select:focus { border-color: #C0392B; }
 
 .error { color: #C0392B; font-size: 12px; margin-top: 2px; }
+
+.advertencia-edad { color: #9a6700; font-size: 12px; margin-top: 2px; }
 
 .advertencia {
   font-size: 15px;

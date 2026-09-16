@@ -1,7 +1,26 @@
-from rest_framework.routers import DefaultRouter
-from .views import InscripcionViewSet
+from django.urls import path
 
-router = DefaultRouter()
-router.register(r'inscripciones', InscripcionViewSet)
+from .views import (
+    CancelarInscripcionView,
+    InscribirseCampaniaView,
+    MisInscripcionesView,
+)
 
-urlpatterns = router.urls
+
+urlpatterns = [
+    path(
+        'mis-inscripciones/',
+        MisInscripcionesView.as_view(),
+        name='mis-inscripciones',
+    ),
+    path(
+        'campanias/<int:campania_id>/',
+        InscribirseCampaniaView.as_view(),
+        name='inscribirse-campania',
+    ),
+    path(
+        '<int:inscripcion_id>/',
+        CancelarInscripcionView.as_view(),
+        name='cancelar-inscripcion',
+    ),
+]
