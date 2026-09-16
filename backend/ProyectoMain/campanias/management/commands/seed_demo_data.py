@@ -4,6 +4,8 @@ from django.core.management.base import BaseCommand, CommandError
 
 from campanias.models import Campania, EstadoCampaniaChoices
 from centros_salud.models import CentroSalud
+from inscripciones.models import Inscripcion
+from usuarios.models import RolChoices, Usuario
 
 
 class Command(BaseCommand):
@@ -122,8 +124,52 @@ class Command(BaseCommand):
             title = data.pop('titulo')
             Campania.objects.update_or_create(titulo=title, defaults=data)
 
+        demo_campaigns = list(Campania.objects.order_by('id')[:10])
+        if len(demo_campaigns) < 10:
+            raise CommandError('No se pudieron preparar 10 campañas de prueba.')
+
+        demo_users = []
+        for index in range(1, 21):
+            email = f'demo.usuario{index:02d}@sangreya.test'
+            user, _ = Usuario.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': f'demo_usuario_{index:02d}',
+                    'dni': f'{50000000 + index}',
+                    'nombre': f'Donante {index:02d}',
+                    'apellido': 'Prueba',
+                    'fecha_nacimiento': date(1990, 1, 1),
+                    'rol': RolChoices.USUARIO_ESTANDAR,
+                    'is_active': True,
+                },
+            )
+            user.username = f'demo_usuario_{index:02d}'
+            user.dni = f'{50000000 + index}'
+            user.nombre = f'Donante {index:02d}'
+            user.apellido = 'Prueba'
+            user.fecha_nacimiento = date(1990, 1, 1)
+            user.rol = RolChoices.USUARIO_ESTANDAR
+            user.is_active = True
+            user.set_password('DemoSangreYa2026!')
+            user.save()
+            demo_users.append(user)
+
+        inscription_count = 0
+        for index, user in enumerate(demo_users):
+            amount = 2 + (index % 4)
+            for offset in range(amount):
+                campaign = demo_campaigns[(index + offset) % len(demo_campaigns)]
+                _, created = Inscripcion.objects.get_or_create(
+                    usuario=user,
+                    campania=campaign,
+                )
+                if created:
+                    inscription_count += 1
+
         self.stdout.write(self.style.SUCCESS(
-            'Datos de prueba creados: 25 centros y 10 campañas.'
+            'Datos de prueba listos: 25 centros, 10 campañas, '
+            '20 usuarios estándar y entre 2 y 5 inscripciones por usuario. '
+            f'Inscripciones nuevas: {inscription_count}.'
         ))
 
     @staticmethod
