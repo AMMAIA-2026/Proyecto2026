@@ -38,8 +38,9 @@
         <thead>
           <tr>
             <th>Estado</th>
-            <th>Email</th>
-            <th>Asunto</th>
+            <th>Nombre completo</th>
+            <th>Correo electrónico</th>
+            <th>Motivo</th>
             <th>Fecha</th>
             <th>Acción</th>
           </tr>
@@ -52,13 +53,14 @@
                 {{ contacto.tracked ? 'Leído' : 'Pendiente' }}
               </span>
             </td>
-            <td>{{ contacto.email }}</td>
-            <td class="asunto">{{ contacto.asunto }}</td>
+            <td>{{ contacto.nombre_completo }}</td>
+            <td>{{ contacto.correo_electronico }}</td>
+            <td class="motivo">{{ contacto.motivo }}</td>
             <td>{{ contacto.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</td>
             <td><button class="ver-btn" (click)="abrirDetalle(contacto.id)">Ver mensaje</button></td>
           </tr>
           } @empty {
-          <tr><td colspan="5" class="estado">No hay mensajes para este filtro.</td></tr>
+          <tr><td colspan="6" class="estado">No hay mensajes para este filtro.</td></tr>
           }
         </tbody>
       </table>
@@ -74,9 +76,10 @@
     <span class="badge" [class.badge--tracked]="contacto.tracked">
       {{ contacto.tracked ? 'Leído' : 'Pendiente' }}
     </span>
-    <h2>{{ contacto.asunto }}</h2>
+    <h2>{{ contacto.motivo }}</h2>
     <div class="mensaje-meta">
-      <a [href]="'mailto:' + contacto.email">{{ contacto.email }}</a>
+      <span>{{ contacto.nombre_completo }}</span>
+      <a [href]="'mailto:' + contacto.correo_electronico">{{ contacto.correo_electronico }}</a>
       <span>{{ contacto.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</span>
     </div>
     <p class="mensaje-contenido">{{ contacto.mensaje }}</p>

@@ -15,22 +15,38 @@
 
   <form class="contact-form" [formGroup]="contactoForm" (ngSubmit)="enviar()">
     <div class="field">
-      <label for="contacto-email">Email</label>
-      <input id="contacto-email" type="email" placeholder="tu@email.com" formControlName="email">
-      @if (contactoForm.get('email')?.invalid && contactoForm.get('email')?.touched) {
+      <label for="contacto-nombre">Nombre completo</label>
+      <input id="contacto-nombre" type="text" maxlength="100" placeholder="Tu nombre y apellido" formControlName="nombre_completo">
+      <span class="counter">{{ contactoForm.get('nombre_completo')?.value?.length || 0 }}/100</span>
+      @if (contactoForm.get('nombre_completo')?.invalid && contactoForm.get('nombre_completo')?.touched) {
       <small>
-        @if (contactoForm.get('email')?.errors?.['required']) { El email es obligatorio }
-        @if (contactoForm.get('email')?.errors?.['email']) { Ingresá un email válido }
+        @if (contactoForm.get('nombre_completo')?.errors?.['required']) { El nombre completo es obligatorio }
+        @if (contactoForm.get('nombre_completo')?.errors?.['maxlength']) { No puede superar 100 caracteres }
       </small>
       }
     </div>
 
     <div class="field">
-      <label for="contacto-asunto">Asunto</label>
-      <input id="contacto-asunto" type="text" maxlength="100" placeholder="¿En qué podemos ayudarte?" formControlName="asunto">
-      <span class="counter">{{ contactoForm.get('asunto')?.value?.length || 0 }}/100</span>
-      @if (contactoForm.get('asunto')?.invalid && contactoForm.get('asunto')?.touched) {
-      <small>El asunto es obligatorio y no puede superar 100 caracteres</small>
+      <label for="contacto-email">Correo electrónico</label>
+      <input id="contacto-email" type="email" placeholder="tu@email.com" formControlName="correo_electronico">
+      @if (contactoForm.get('correo_electronico')?.invalid && contactoForm.get('correo_electronico')?.touched) {
+      <small>
+        @if (contactoForm.get('correo_electronico')?.errors?.['required']) { El correo electrónico es obligatorio }
+        @if (contactoForm.get('correo_electronico')?.errors?.['email']) { Ingresá un correo válido }
+      </small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="contacto-motivo">Motivo</label>
+      <select id="contacto-motivo" formControlName="motivo">
+        <option value="">Seleccioná un motivo</option>
+        @for (motivo of motivos; track motivo) {
+        <option [value]="motivo">{{ motivo }}</option>
+        }
+      </select>
+      @if (contactoForm.get('motivo')?.invalid && contactoForm.get('motivo')?.touched) {
+      <small>El motivo es obligatorio</small>
       }
     </div>
 

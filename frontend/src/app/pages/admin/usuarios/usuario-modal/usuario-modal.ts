@@ -20,9 +20,6 @@ export class UsuarioModal implements OnChanges {
   editForm: FormGroup;
   cargando = false;
   error = '';
-  readonly gruposSanguineos = [
-    'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'
-  ];
 
   constructor(
     private fb: FormBuilder,
@@ -34,7 +31,6 @@ export class UsuarioModal implements OnChanges {
       email: ['', [Validators.required, Validators.email]],
       dni: ['', Validators.required],
       fecha_nacimiento: ['', Validators.required],
-      grupo_sanguineo: ['', Validators.required],
     });
   }
 
@@ -47,7 +43,6 @@ export class UsuarioModal implements OnChanges {
         email: this.usuario.email,
         dni: this.usuario.dni,
         fecha_nacimiento: this.usuario.fecha_nacimiento,
-        grupo_sanguineo: this.usuario.grupo_sanguineo,
       });
     }
   }

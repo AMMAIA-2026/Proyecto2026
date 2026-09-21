@@ -18,19 +18,11 @@ import { advertenciaEdad } from '../../../validators/edad.validator';
 export class Registro {
 
   registroForm: FormGroup;
-  grupos = [
-    'A+',
-    'A-',
-    'B+',
-    'B-',
-    'AB+',
-    'AB-',
-    'O+',
-    'O-'
-  ];
   mensaje = '';
   error = '';
   cargando = false;
+  mostrarPassword = false;
+  mostrarConfirmarPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -43,11 +35,10 @@ export class Registro {
        password: ['', validadoresPassword()],
        confirmar_password: ['', Validators.required],
       nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
-      fecha_nacimiento: ['', Validators.required],
-      dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
-       rol: ['Usuario Estandar'],
-      grupo_sanguineo: ['', Validators.required]
+       apellido: ['', Validators.required],
+       fecha_nacimiento: ['', Validators.required],
+       dni: ['', [Validators.required, Validators.minLength(7), Validators.maxLength(8)]],
+       rol: ['Usuario Estandar']
      }, { validators: passwordsCoinciden });
   }
 

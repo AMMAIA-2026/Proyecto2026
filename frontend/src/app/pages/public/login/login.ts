@@ -28,6 +28,7 @@ export class Login {
   loginForm: FormGroup;
 
   mensaje = '';
+  mostrarPassword = false;
 
   constructor(
 

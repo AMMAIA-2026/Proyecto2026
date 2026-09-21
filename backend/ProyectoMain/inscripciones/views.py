@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q, Count
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status
@@ -6,9 +7,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from campanias.models import Campania, EstadoCampaniaChoices
-from usuarios.permissions import EsUsuarioEstandar
+from campanias.serializers import CampaniaSerializer
+from usuarios.permissions import EsAdministrador, EsUsuarioEstandar
 from .models import Inscripcion
-from .serializers import InscripcionSerializer
+from .serializers import (
+    InscripcionPropiaSerializer,
+    InscripcionSerializer,
+    UsuarioInscripcionSerializer,
+)
 
 
 def error_response(codigo, mensaje, http_status):
@@ -20,7 +26,43 @@ def error_response(codigo, mensaje, http_status):
 
 
 class InscribirseCampaniaView(APIView):
-    permission_classes = [EsUsuarioEstandar]
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [EsAdministrador()]
+        return [EsUsuarioEstandar()]
+
+    def get(self, request, campania_id):
+        campania = get_object_or_404(
+            Campania.objects
+            .select_related('centro_salud')
+            .annotate(total_inscriptos_anotado=Count('inscripcion')),
+            pk=campania_id,
+        )
+        inscripciones = Inscripcion.objects.filter(
+            campania=campania,
+        ).select_related('usuario').order_by(
+            'usuario__apellido',
+            'usuario__nombre',
+        )
+        total_inscriptos = inscripciones.count()
+
+        busqueda = request.query_params.get('buscar', '').strip()
+        if busqueda:
+            inscripciones = inscripciones.filter(
+                Q(usuario__nombre__icontains=busqueda)
+                | Q(usuario__apellido__icontains=busqueda)
+                | Q(usuario__dni__icontains=busqueda)
+                | Q(usuario__email__icontains=busqueda)
+            )
+
+        return Response({
+            'campania': CampaniaSerializer(campania).data,
+            'total_inscriptos': total_inscriptos,
+            'usuarios': UsuarioInscripcionSerializer(
+                [inscripcion.usuario for inscripcion in inscripciones],
+                many=True,
+            ).data,
+        })
 
     def post(self, request, campania_id):
         hoy = timezone.localdate()
@@ -87,3 +129,64 @@ class InscribirseCampaniaView(APIView):
             'data': InscripcionSerializer(inscripcion).data,
             'totalInscriptos': total,
         }, status=status.HTTP_201_CREATED)
+
+
+class MisInscripcionesView(APIView):
+    permission_classes = [EsUsuarioEstandar]
+
+    def get(self, request):
+        inscripciones = Inscripcion.objects.filter(
+            usuario=request.user,
+        ).select_related('campania__centro_salud').order_by(
+            'campania__fecha_inicio',
+            '-id',
+        )
+
+        actuales = []
+        historicas = []
+
+        for inscripcion in inscripciones:
+            estado = CampaniaSerializer.calcular_estado(
+                inscripcion.campania.fecha_inicio,
+                inscripcion.campania.fecha_fin,
+                inscripcion.campania.cupo_maximo,
+                inscripcion.campania.inscripcion_set.count(),
+            )
+            serialized = InscripcionPropiaSerializer(inscripcion).data
+            if estado == EstadoCampaniaChoices.FINALIZADA:
+                historicas.append(serialized)
+            else:
+                actuales.append(serialized)
+
+        return Response({
+            'actuales': actuales,
+            'historicas': historicas,
+        })
+
+
+class CancelarInscripcionView(APIView):
+    permission_classes = [EsUsuarioEstandar]
+
+    def delete(self, request, inscripcion_id):
+        inscripcion = get_object_or_404(
+            Inscripcion.objects.select_related('campania'),
+            pk=inscripcion_id,
+            usuario=request.user,
+        )
+        campania = inscripcion.campania
+        estado = CampaniaSerializer.calcular_estado(
+            campania.fecha_inicio,
+            campania.fecha_fin,
+            campania.cupo_maximo,
+            campania.inscripcion_set.count(),
+        )
+
+        if estado == EstadoCampaniaChoices.FINALIZADA:
+            return error_response(
+                'campania_finalizada',
+                'No podés cancelar una inscripción de una campaña finalizada.',
+                status.HTTP_400_BAD_REQUEST,
+            )
+
+        inscripcion.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

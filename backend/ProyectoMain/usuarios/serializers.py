@@ -58,7 +58,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'fecha_nacimiento',
             'fecha_registro',
             'rol',
-            'grupo_sanguineo',
         ]
         read_only_fields = [
             'rol',

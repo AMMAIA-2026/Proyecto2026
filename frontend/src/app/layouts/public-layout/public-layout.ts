@@ -29,6 +29,10 @@ export class PublicLayout {
     return !!localStorage.getItem('access_token');
   }
 
+  isStandardUser(): boolean {
+    return this.isLoggedIn() && localStorage.getItem('rol') === 'Usuario Estandar';
+  }
+
   logout() {
     localStorage.clear();
     this.router.navigate(['/']);
