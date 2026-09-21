@@ -43,7 +43,7 @@ def validar_datos_legacy(apps, schema_editor):
                 f'El usuario {usuario.pk} tiene un rol no permitido: {rol!r}'
             )
 
-        if grupo not in GRUPOS_VALIDOS:
+        if grupo is not None and grupo not in GRUPOS_VALIDOS:
             raise ValueError(
                 f'El usuario {usuario.pk} tiene un grupo sanguíneo no permitido: {grupo!r}'
             )
@@ -73,7 +73,7 @@ def copiar_valores_a_choices(apps, schema_editor):
                 f'El usuario {usuario.pk} tiene un rol no permitido: {rol!r}'
             )
 
-        if grupo not in GRUPOS_VALIDOS:
+        if grupo is not None and grupo not in GRUPOS_VALIDOS:
             raise ValueError(
                 f'El usuario {usuario.pk} tiene un grupo sanguíneo no permitido: {grupo!r}'
             )
@@ -194,7 +194,7 @@ class Migration(migrations.Migration):
             model_name='usuario',
             name='grupo_sanguineo',
             field=models.CharField(
-                blank=False,
+                blank=True,
                 choices=[
                     ('A+', 'A+'),
                     ('A-', 'A-'),
@@ -206,7 +206,7 @@ class Migration(migrations.Migration):
                     ('O-', 'O-'),
                 ],
                 max_length=3,
-                null=False,
+                null=True,
             ),
         ),
         migrations.DeleteModel(
