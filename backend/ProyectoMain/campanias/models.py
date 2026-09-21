@@ -1,10 +1,12 @@
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
+
 
 class EstadoCampaniaChoices(models.TextChoices):
     ACTIVA = 'Activa', 'Activa'
     FINALIZADA = 'Finalizada', 'Finalizada'
     PROXIMAMENTE = 'Proximamente', 'Próximamente'
+
 
 class Campania(models.Model):
     titulo = models.CharField(max_length=100)
@@ -28,7 +30,7 @@ class Campania(models.Model):
         max_length=12,
         choices=EstadoCampaniaChoices.choices,
         null=False,
-        blank=False
+        blank=False,
     )
 
     class Meta:
@@ -36,9 +38,3 @@ class Campania(models.Model):
 
     def __str__(self):
         return self.titulo
-
-
-
-    
-
-    

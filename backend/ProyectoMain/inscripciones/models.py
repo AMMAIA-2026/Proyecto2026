@@ -22,7 +22,5 @@ class Inscripcion(models.Model):
                     name='inscripcion_unica_usuario_campania',
                 )
             ]
-        
         def __str__(self):
             return f"{self.usuario} - {self.campania}"
-        

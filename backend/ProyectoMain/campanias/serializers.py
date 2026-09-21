@@ -1,10 +1,11 @@
+from django.utils import timezone
 from rest_framework import serializers
+
 from .models import Campania, EstadoCampaniaChoices
 from centros_salud.serializers import CentroSaludSerializer
-from django.utils import timezone
+
 
 class CampaniaSerializer(serializers.ModelSerializer):
-
     estado_calculado = serializers.SerializerMethodField()
     total_inscriptos = serializers.SerializerMethodField()
     centro_salud_detalle = CentroSaludSerializer(
@@ -37,7 +38,6 @@ class CampaniaSerializer(serializers.ModelSerializer):
         if fecha_inicio is None or fecha_fin is None:
             return attrs
 
-        #TODO. REVISAR VALIDEZ PARA NEGOCIO
         if self.instance is None and fecha_inicio < hoy:
             raise serializers.ValidationError({
                 'fecha_inicio': 'La fecha de inicio no puede ser anterior a hoy.'
