@@ -29,6 +29,16 @@ python manage.py seed_campanias_reales --check-only
 python manage.py seed_demo_data
 ```
 
+Si la consola ya muestra un prompt dentro de
+`.../backend/ProyectoMain`, usar directamente:
+
+```bash
+python -m pip install -r ../requirements.txt
+python manage.py migrate --noinput
+python manage.py seed_campanias_reales
+python manage.py seed_demo_data
+```
+
 Reemplazar solamente `NOMBRE_DEL_VIRTUALENV` por el nombre real del virtualenv.
 Se puede consultar con `ls -la /home/sangreyaispc/.virtualenvs`. Si todavía no
 existe, crearlo una sola vez y luego instalar las dependencias:
