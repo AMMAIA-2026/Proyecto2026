@@ -16,6 +16,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
+        self.report_progress('Sincronizando campañas base...')
         campaigns = [
             {
                 'titulo': 'Donación de Sangre Hospital Central',
@@ -128,59 +129,24 @@ class Command(BaseCommand):
             title = data.pop('titulo')
             Campania.objects.update_or_create(titulo=title, defaults=data)
 
-        demo_campaigns = list(Campania.objects.order_by('id')[:10])
-        if len(demo_campaigns) < 10:
-            raise CommandError('No se pudieron preparar 10 campañas de prueba.')
-
-        demo_users = []
-        for index in range(1, 21):
-            email = f'demo.usuario{index:02d}@sangreya.test'
-            user, _ = Usuario.objects.get_or_create(
-                email=email,
-                defaults={
-                    'username': f'demo_usuario_{index:02d}',
-                    'dni': f'{50000000 + index}',
-                    'nombre': f'Donante {index:02d}',
-                    'apellido': 'Prueba',
-                    'fecha_nacimiento': date(1990, 1, 1),
-                    'rol': RolChoices.USUARIO_ESTANDAR,
-                    'is_active': True,
-                },
-            )
-            user.username = f'demo_usuario_{index:02d}'
-            user.dni = f'{50000000 + index}'
-            user.nombre = f'Donante {index:02d}'
-            user.apellido = 'Prueba'
-            user.fecha_nacimiento = date(1990, 1, 1)
-            user.rol = RolChoices.USUARIO_ESTANDAR
-            user.is_active = True
-            user.set_password('DemoSangreYa2026!')
-            user.save()
-            demo_users.append(user)
-
-        inscription_count = 0
-        for index, user in enumerate(demo_users):
-            amount = 2 + (index % 4)
-            for offset in range(amount):
-                campaign = demo_campaigns[(index + offset) % len(demo_campaigns)]
-                _, created = Inscripcion.objects.get_or_create(
-                    usuario=user,
-                    campania=campaign,
-                )
-                if created:
-                    inscription_count += 1
-
+        self.report_progress('Creando usuarios de edades límite...')
         self.create_manual_test_users()
         self.create_capacity_test_campaign()
+        self.report_progress('Generando histórico mensual...')
+        demo_users = self.get_history_users()
         historical_inscriptions = self.create_dashboard_history(demo_users)
 
         self.stdout.write(self.style.SUCCESS(
             'Datos de prueba listos: 25 centros, 10 campañas base, '
             '1 campaña de cupo y '
-            '20 usuarios estándar, 2 usuarios de edad límite y '
+            '2 usuarios de edad límite y '
             '11 campañas históricas. '
-            f'Inscripciones nuevas: {inscription_count + historical_inscriptions}.'
+            f'Inscripciones históricas nuevas: {historical_inscriptions}.'
         ))
+
+    def report_progress(self, message):
+        self.stdout.write(message)
+        self.stdout.flush()
 
     def create_manual_test_users(self):
         hoy = timezone.localdate()
@@ -221,6 +187,24 @@ class Command(BaseCommand):
             user.is_active = True
             user.set_password('Qwerty123.')
             user.save()
+
+    def get_history_users(self):
+        excluded_emails = [
+            'usuariomenor18@unmail.com',
+            'usuariomayor65@unmail.com',
+        ]
+        users = list(
+            Usuario.objects
+            .filter(rol=RolChoices.USUARIO_ESTANDAR)
+            .exclude(email__in=excluded_emails)
+            .order_by('id')[:5]
+        )
+        if len(users) < 5:
+            raise CommandError(
+                'Se necesitan al menos 5 usuarios estándar para generar el '
+                'histórico. Ejecutá las migraciones antes del seed.'
+            )
+        return users
 
     def create_capacity_test_campaign(self):
         center = CentroSalud.objects.get(pk=1)
