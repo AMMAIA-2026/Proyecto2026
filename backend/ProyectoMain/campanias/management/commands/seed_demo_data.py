@@ -1,6 +1,7 @@
-from datetime import date
+from datetime import date, datetime, time, timedelta
 
 from django.core.management.base import BaseCommand, CommandError
+from django.utils import timezone
 
 from campanias.models import Campania, EstadoCampaniaChoices
 from centros_salud.models import CentroSalud
@@ -9,7 +10,10 @@ from usuarios.models import RolChoices, Usuario
 
 
 class Command(BaseCommand):
-    help = 'Crea 10 campañas de prueba asociadas a centros existentes.'
+    help = (
+        'Crea datos de prueba para campañas, edades límite e histórico mensual '
+        'del dashboard.'
+    )
 
     def handle(self, *args, **options):
         campaigns = [
@@ -166,11 +170,151 @@ class Command(BaseCommand):
                 if created:
                     inscription_count += 1
 
+        self.create_manual_test_users()
+        self.create_capacity_test_campaign()
+        historical_inscriptions = self.create_dashboard_history(demo_users)
+
         self.stdout.write(self.style.SUCCESS(
-            'Datos de prueba listos: 25 centros, 10 campañas, '
-            '20 usuarios estándar y entre 2 y 5 inscripciones por usuario. '
-            f'Inscripciones nuevas: {inscription_count}.'
+            'Datos de prueba listos: 25 centros, 10 campañas base, '
+            '1 campaña de cupo y '
+            '20 usuarios estándar, 2 usuarios de edad límite y '
+            '11 campañas históricas. '
+            f'Inscripciones nuevas: {inscription_count + historical_inscriptions}.'
         ))
+
+    def create_manual_test_users(self):
+        hoy = timezone.localdate()
+        users = [
+            {
+                'email': 'usuariomenor18@unmail.com',
+                'dni': '60160016',
+                'nombre': 'Menor',
+                'apellido': 'Usuario',
+                'fecha_nacimiento': self.birth_date_for_age(hoy, 16),
+            },
+            {
+                'email': 'usuariomayor65@unmail.com',
+                'dni': '60700070',
+                'nombre': 'Mayor',
+                'apellido': 'Usuario',
+                'fecha_nacimiento': self.birth_date_for_age(hoy, 70),
+            },
+        ]
+
+        for data in users:
+            email = data['email']
+            user, _ = Usuario.objects.get_or_create(
+                email=email,
+                defaults={
+                    **data,
+                    'username': email,
+                    'rol': RolChoices.USUARIO_ESTANDAR,
+                    'is_active': True,
+                },
+            )
+            user.username = email
+            user.dni = data['dni']
+            user.nombre = data['nombre']
+            user.apellido = data['apellido']
+            user.fecha_nacimiento = data['fecha_nacimiento']
+            user.rol = RolChoices.USUARIO_ESTANDAR
+            user.is_active = True
+            user.set_password('Qwerty123.')
+            user.save()
+
+    def create_capacity_test_campaign(self):
+        center = CentroSalud.objects.get(pk=1)
+        today = timezone.localdate()
+        campaign, _ = Campania.objects.get_or_create(
+            titulo='Campaña de test Cupo',
+            defaults={
+                'descripcion': (
+                    'Campaña de prueba para validar el límite de un donante '
+                    'y el cambio de estado al completar el cupo.'
+                ),
+                'ubicacion': center.nombre,
+                'centro_salud': center,
+                'fecha_inicio': today,
+                'fecha_fin': today + timedelta(days=30),
+                'cupo_maximo': 1,
+                'estado_campania': EstadoCampaniaChoices.ACTIVA,
+            },
+        )
+
+        total_inscriptos = Inscripcion.objects.filter(campania=campaign).count()
+        campaign.descripcion = (
+            'Campaña de prueba para validar el límite de un donante '
+            'y el cambio de estado al completar el cupo.'
+        )
+        campaign.ubicacion = center.nombre
+        campaign.centro_salud = center
+        campaign.fecha_inicio = today
+        campaign.fecha_fin = today + timedelta(days=30)
+        campaign.cupo_maximo = 1
+        campaign.estado_campania = (
+            EstadoCampaniaChoices.FINALIZADA
+            if total_inscriptos >= 1
+            else EstadoCampaniaChoices.ACTIVA
+        )
+        campaign.save()
+
+    def create_dashboard_history(self, demo_users):
+        today = timezone.localdate()
+        center = CentroSalud.objects.get(pk=1)
+        # Varying counts make the chart useful while keeping the dump small.
+        counts_by_month = [1, 2, 3, 2, 4, 1, 3, 2, 5, 3, 4]
+        created_inscriptions = 0
+
+        for index, months_ago in enumerate(range(11, 0, -1)):
+            month_start = self.month_start(today, months_ago)
+            next_month = self.month_start(today, months_ago - 1)
+            month_end = next_month - timedelta(days=1)
+            title = f'Dump gráfico {month_start:%Y-%m}'
+            campaign, _ = Campania.objects.update_or_create(
+                titulo=title,
+                defaults={
+                    'descripcion': 'Datos históricos de prueba para el dashboard.',
+                    'ubicacion': center.nombre,
+                    'centro_salud': center,
+                    'fecha_inicio': month_start,
+                    'fecha_fin': month_end,
+                    'cupo_maximo': 50,
+                    'estado_campania': EstadoCampaniaChoices.FINALIZADA,
+                },
+            )
+
+            for user_index in range(counts_by_month[index]):
+                user = demo_users[user_index]
+                inscription, created = Inscripcion.objects.get_or_create(
+                    usuario=user,
+                    campania=campaign,
+                )
+                if created:
+                    created_inscriptions += 1
+
+                inscription_date = month_start + timedelta(days=5 + user_index)
+                inscription_datetime = timezone.make_aware(
+                    datetime.combine(inscription_date, time(hour=10 + user_index)),
+                    timezone.get_current_timezone(),
+                )
+                Inscripcion.objects.filter(pk=inscription.pk).update(
+                    fecha_inscripcion=inscription_datetime,
+                )
+
+        return created_inscriptions
+
+    @staticmethod
+    def birth_date_for_age(today, age):
+        try:
+            return today.replace(year=today.year - age)
+        except ValueError:
+            return today.replace(year=today.year - age, day=28)
+
+    @staticmethod
+    def month_start(today, months_ago):
+        month_index = today.year * 12 + today.month - 1 - months_ago
+        year, month_index = divmod(month_index, 12)
+        return date(year, month_index + 1, 1)
 
     @staticmethod
     def calculate_status(start_date, end_date):
