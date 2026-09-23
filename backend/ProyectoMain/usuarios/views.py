@@ -22,7 +22,7 @@ class UsuarioQuerysetMixin:
 
     def get_object(self, request, usuario_id):
         usuario = get_object_or_404(
-            self.get_queryset(request),
+            Usuario.objects.all(),
             pk=usuario_id,
         )
         self.check_object_permissions(request, usuario)
