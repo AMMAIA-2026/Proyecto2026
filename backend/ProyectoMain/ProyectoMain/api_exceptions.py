@@ -1,4 +1,5 @@
 from rest_framework.views import exception_handler
+from rest_framework.exceptions import PermissionDenied
 
 
 def api_exception_handler(exc, context):
@@ -8,6 +9,14 @@ def api_exception_handler(exc, context):
 
     codigo = getattr(exc, 'default_code', 'error_api')
     data = response.data
+
+    if isinstance(exc, PermissionDenied):
+        response.data = {
+            'codigo': 'permiso_denegado',
+            'mensaje': 'No tenés permisos para acceder a este recurso.',
+            'status_code': response.status_code,
+        }
+        return response
 
     if isinstance(data, dict):
         data = dict(data)

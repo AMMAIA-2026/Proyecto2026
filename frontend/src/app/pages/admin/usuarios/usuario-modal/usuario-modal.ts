@@ -98,7 +98,7 @@ export class UsuarioModal implements OnChanges {
       },
       error: () => {
         this.cargando = false;
-        this.error = 'Error al eliminar el usuario.';
+        this.error = 'No se pudo eliminar la cuenta.';
       }
     });
   }

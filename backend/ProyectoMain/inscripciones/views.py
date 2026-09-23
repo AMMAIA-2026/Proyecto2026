@@ -101,7 +101,7 @@ class InscribirseCampaniaView(APIView):
             ).exists():
                 return error_response(
                     'inscripcion_duplicada',
-                    'Ya estás inscripto en esta campaña.',
+                    'Ya contás con una inscripción en esta campaña.',
                     status.HTTP_409_CONFLICT,
                 )
 

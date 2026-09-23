@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.validators import UniqueValidator
 from django.core.validators import RegexValidator
 from .models import Usuario, RolChoices
 from django.contrib.auth import authenticate
@@ -39,6 +40,27 @@ def campo_password():
 class UsuarioSerializer(serializers.ModelSerializer):
 
     password = campo_password()
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(
+                queryset=Usuario.objects.all(),
+                message='El correo electrónico ya está registrado.',
+            ),
+        ],
+    )
+    dni = serializers.CharField(
+        max_length=8,
+        validators=[
+            RegexValidator(
+                regex=r'^\d{7,8}$',
+                message='El DNI debe contener entre 7 y 8 dígitos.',
+            ),
+            UniqueValidator(
+                queryset=Usuario.objects.all(),
+                message='El DNI ya está registrado.',
+            ),
+        ],
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
