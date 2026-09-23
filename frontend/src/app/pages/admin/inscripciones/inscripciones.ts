@@ -68,7 +68,7 @@ export class AdminInscripciones implements OnInit {
         this.cargandoDetalle.set(false);
       },
       error: () => {
-        this.error.set('No se pudieron cargar los inscriptos de la campaña.');
+        this.error.set('No se pudieron cargar las personas inscriptas en la campaña.');
         this.cargandoDetalle.set(false);
       },
     });

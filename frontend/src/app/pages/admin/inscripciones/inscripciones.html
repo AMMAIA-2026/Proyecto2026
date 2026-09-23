@@ -3,7 +3,7 @@
     <div>
       <span class="eyebrow">Gestión administrativa</span>
       <h1>Inscripciones</h1>
-      <p>Consultá quiénes están inscriptos en cada campaña.</p>
+      <p>Consultá quiénes tienen una inscripción en cada campaña.</p>
     </div>
   </header>
 
@@ -40,7 +40,7 @@
 
     <section class="inscriptos-panel">
       @if (cargandoDetalle()) {
-        <p class="estado">Cargando inscriptos...</p>
+        <p class="estado">Cargando personas inscriptas...</p>
       } @else if (seleccion(); as detalle) {
         <header class="detalle-header">
           <div>
@@ -52,10 +52,10 @@
               {{ detalle.campania.estado_calculado }}
             </p>
           </div>
-          <strong class="total-badge">{{ detalle.total_inscriptos }} inscriptos</strong>
+          <strong class="total-badge">{{ detalle.total_inscriptos }} personas inscriptas</strong>
         </header>
 
-        <label class="busqueda-label" for="buscar-inscripto">Buscar usuario</label>
+        <label class="busqueda-label" for="buscar-inscripto">Buscar persona</label>
         <input
           id="buscar-inscripto"
           class="busqueda-input"
@@ -88,7 +88,7 @@
           </table>
         </div>
       } @else {
-        <p class="estado estado--empty">Seleccioná una campaña para ver sus inscriptos.</p>
+        <p class="estado estado--empty">Seleccioná una campaña para ver a las personas inscriptas.</p>
       }
     </section>
   </div>

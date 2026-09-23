@@ -27,35 +27,40 @@
           <label>Nombre</label>
           <input type="text" formControlName="nombre">
           @if (editForm.get('nombre')?.invalid && editForm.get('nombre')?.touched) {
-            <small class="error">Obligatorio</small>
+            <small class="error">El nombre es obligatorio.</small>
           }
         </div>
         <div class="campo">
           <label>Apellido</label>
           <input type="text" formControlName="apellido">
           @if (editForm.get('apellido')?.invalid && editForm.get('apellido')?.touched) {
-            <small class="error">Obligatorio</small>
+            <small class="error">El apellido es obligatorio.</small>
           }
         </div>
         <div class="campo">
           <label>Email</label>
           <input type="email" formControlName="email">
           @if (editForm.get('email')?.invalid && editForm.get('email')?.touched) {
-            <small class="error">Email inválido</small>
+            @if (editForm.get('email')?.errors?.['required']) {
+              <small class="error">El correo electrónico es obligatorio.</small>
+            }
+            @if (editForm.get('email')?.errors?.['email']) {
+              <small class="error">El correo electrónico no es válido.</small>
+            }
           }
         </div>
         <div class="campo">
           <label>DNI</label>
           <input type="text" formControlName="dni">
           @if (editForm.get('dni')?.invalid && editForm.get('dni')?.touched) {
-            <small class="error">Obligatorio</small>
+            <small class="error">El DNI es obligatorio.</small>
           }
         </div>
         <div class="campo">
           <label>Fecha de nacimiento</label>
           <input type="date" formControlName="fecha_nacimiento">
           @if (editForm.get('fecha_nacimiento')?.invalid && editForm.get('fecha_nacimiento')?.touched) {
-            <small class="error">Obligatorio</small>
+            <small class="error">La fecha de nacimiento es obligatoria.</small>
           }
           @if (advertenciaFechaNacimiento()) {
             <small class="advertencia-edad">{{ advertenciaFechaNacimiento() }}</small>
@@ -75,7 +80,7 @@
     @if (modo === 'eliminar' && usuario) {
       <div class="modal-body">
         <p class="advertencia">
-          ¿Estás segura que querés eliminar a
+          ¿Querés eliminar a
           <strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong>?
           Esta acción no se puede deshacer.
         </p>
