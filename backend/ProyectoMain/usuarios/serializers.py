@@ -4,6 +4,7 @@ from rest_framework.validators import UniqueValidator
 from django.core.validators import RegexValidator
 from .models import Usuario, RolChoices
 from django.contrib.auth import authenticate
+from ProyectoMain.security_log import LOGIN_FAILED, log_security_event, mask_email
 
 
 VALIDADORES_PASSWORD = [
@@ -123,6 +124,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         )
 
         if user is None:
+            log_security_event(
+                self.context.get('request'),
+                LOGIN_FAILED,
+                'invalid_credentials',
+                detail=f'email={mask_email(email)}',
+            )
             raise serializers.ValidationError(
                 'Credenciales incorrectas',
                 code='credenciales_incorrectas',
