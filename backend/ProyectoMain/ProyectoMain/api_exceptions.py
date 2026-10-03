@@ -1,8 +1,11 @@
+from math import ceil
+
 from rest_framework.views import exception_handler
 from rest_framework.exceptions import (
     AuthenticationFailed,
     NotAuthenticated,
     PermissionDenied,
+    Throttled,
 )
 
 from .security_log import (
@@ -15,6 +18,12 @@ SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
 
 def _log_denied_request(exc, request, status_code):
+    if (
+        isinstance(exc, AuthenticationFailed)
+        and exc.get_codes() == 'credenciales_incorrectas'
+    ):
+        # CustomTokenObtainPairSerializer ya registra LOGIN_FAILED con email enmascarado.
+        return
     if isinstance(exc, (NotAuthenticated, AuthenticationFailed)):
         log_security_event(request, ACCESS_DENIED, status_code)
     elif isinstance(exc, PermissionDenied):
@@ -37,6 +46,22 @@ def api_exception_handler(exc, context):
         response.data = {
             'codigo': 'permiso_denegado',
             'mensaje': 'No tenés permisos para acceder a este recurso.',
+            'status_code': response.status_code,
+        }
+        return response
+
+    if isinstance(exc, Throttled):
+        espera = (
+            f'{ceil(exc.wait)} segundos'
+            if exc.wait is not None
+            else 'unos instantes'
+        )
+        response.data = {
+            'codigo': str(codigo),
+            'mensaje': (
+                'Solicitud denegada por exceso de intentos. '
+                f'Se espera que esté disponible en {espera}.'
+            ),
             'status_code': response.status_code,
         }
         return response

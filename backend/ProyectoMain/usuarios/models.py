@@ -49,6 +49,10 @@ class Usuario(AbstractUser):
         null=False,
         blank=False
     )
+    # Se incluye en access JWT y se incrementa cuando cambia la contraseña,
+    # para revocar también access tokens que SimpleJWT no pone en blacklist.
+    token_version = models.PositiveIntegerField(default=0, editable=False)
+
     class Meta:
         db_table = 'usuarios'
 

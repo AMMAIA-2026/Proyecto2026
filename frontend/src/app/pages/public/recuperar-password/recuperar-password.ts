@@ -61,7 +61,9 @@ export class RecuperarPassword {
         this.enviando = false;
         const mensajes = Object.values(err.error || {}).flat();
         this.error = String(
-          mensajes[0] || 'No se pudo procesar la solicitud. Revisá los datos.'
+          err.error?.mensaje ||
+          mensajes[0] ||
+          'No se pudo procesar la solicitud. Revisá los datos.'
         );
       }
     });
