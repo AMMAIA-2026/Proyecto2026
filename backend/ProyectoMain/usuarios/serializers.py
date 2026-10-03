@@ -1,10 +1,13 @@
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.validators import UniqueValidator
 from django.core.validators import RegexValidator
+from django.db import transaction
 from .models import Usuario, RolChoices
 from django.contrib.auth import authenticate
 from ProyectoMain.security_log import LOGIN_FAILED, log_security_event, mask_email
+from .session_security import change_password_and_revoke_sessions
 
 
 VALIDADORES_PASSWORD = [
@@ -97,11 +100,10 @@ class UsuarioSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
         validated_data.pop('rol', None)
-        user = super().update(instance, validated_data)
-
-        if password:
-            user.set_password(password)
-            user.save(update_fields=['password'])
+        with transaction.atomic():
+            user = super().update(instance, validated_data)
+            if password:
+                change_password_and_revoke_sessions(user, password)
 
         return user
 
@@ -109,6 +111,14 @@ class UsuarioSerializer(serializers.ModelSerializer):
 class RecuperarPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = campo_password()
+    password_confirmation = serializers.CharField(write_only=True, trim_whitespace=False)
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password_confirmation']:
+            raise serializers.ValidationError({
+                'password_confirmation': 'Las contraseñas no coinciden.',
+            })
+        return attrs
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -130,7 +140,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
                 'invalid_credentials',
                 detail=f'email={mask_email(email)}',
             )
-            raise serializers.ValidationError(
+            raise AuthenticationFailed(
                 'Credenciales incorrectas',
                 code='credenciales_incorrectas',
             )
@@ -158,5 +168,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['id'] = user.id
         token['email'] = user.email
         token['rol'] = user.rol
+        token['token_version'] = user.token_version
 
         return token
