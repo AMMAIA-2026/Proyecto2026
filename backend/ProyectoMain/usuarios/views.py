@@ -11,6 +11,8 @@ from .serializers import (
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 from usuarios.permissions import EsAdministradorOSiMismo
+from usuarios.session_security import change_password_and_revoke_sessions
+from usuarios.throttles import LoginAttemptThrottle, PasswordRecoveryThrottle
 
 class UsuarioQuerysetMixin:
     permission_classes = [EsAdministradorOSiMismo]
@@ -75,6 +77,7 @@ class RegistroView(APIView):
 
 class RecuperarPasswordView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [PasswordRecoveryThrottle]
 
     def post(self, request):
         serializer = RecuperarPasswordSerializer(data=request.data)
@@ -85,8 +88,7 @@ class RecuperarPasswordView(APIView):
         usuario = Usuario.objects.filter(email__iexact=email).first()
 
         if usuario:
-            usuario.set_password(password)
-            usuario.save(update_fields=['password'])
+            change_password_and_revoke_sessions(usuario, password)
 
         return Response({
             'message': (
@@ -97,4 +99,5 @@ class RecuperarPasswordView(APIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    throttle_classes = [LoginAttemptThrottle]
 

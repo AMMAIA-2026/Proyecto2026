@@ -91,7 +91,7 @@ export class Login {
       },
       error: (error) => {
 
-        this.mensaje = 'Credenciales incorrectas';
+        this.mensaje = error.error?.mensaje || 'Credenciales incorrectas';
         this.loginForm.get('password')?.reset();
         this.loginForm.markAsUntouched();
 
