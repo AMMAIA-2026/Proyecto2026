@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Usuario, RolChoices
@@ -74,9 +74,9 @@ class RegistroView(APIView):
         errores['status_code'] = status.HTTP_400_BAD_REQUEST
         return Response(errores, status=status.HTTP_400_BAD_REQUEST)
 
-
 class RecuperarPasswordView(APIView):
-    permission_classes = [AllowAny]
+    # Deshabilitado: prueba piloto. A futuro se usará token temporal.
+    permission_classes = [IsAdminUser]
     throttle_classes = [PasswordRecoveryThrottle]
 
     def post(self, request):
